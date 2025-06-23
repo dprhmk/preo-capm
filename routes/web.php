@@ -12,6 +12,7 @@ Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
 Route::middleware(['auth'])->group(function () {
 	Route::get('/qr-scan', fn () => view('pages.qr-scanner'))->name('qr.scan');
-	Route::get('/member/edit/{code}', [MemberController::class, 'show'])->name('member.edit');
-	Route::post('/member/store/{code}', [MemberController::class, 'store'])->name('member.store');
+	Route::get('/member/{code}', [MemberController::class, 'show'])->name('member.edit');
+	Route::get('/members', [MemberController::class, 'index'])->name('members.index');
+	Route::post('/member/{code}', [MemberController::class, 'store'])->name('member.store');
 });

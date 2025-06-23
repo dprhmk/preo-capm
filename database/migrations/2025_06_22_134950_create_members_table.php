@@ -13,11 +13,11 @@ return new class extends Migration
 			$table->string('code')->unique();
 
 			/** 1. Основна інформація */
-			$table->string('full_name');
-			$table->date('birth_date');
-			$table->unsignedInteger('age');
-			$table->enum('gender', ['male', 'female']);
-			$table->enum('residence_type', ['stationary', 'non-stationary']);
+			$table->string('full_name')->nullable();
+			$table->date('birth_date')->nullable();
+			$table->unsignedInteger('age')->nullable();
+			$table->enum('gender', ['male', 'female'])->nullable();
+			$table->enum('residence_type', ['stationary', 'non-stationary'])->nullable();
 			$table->boolean('is_bad_boy')->default(false);
 
 			/** 2. Контактна інформація */

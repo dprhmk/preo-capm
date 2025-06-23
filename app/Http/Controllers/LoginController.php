@@ -15,7 +15,7 @@ class LoginController
 			return redirect()->route('qr.scan');
 		}
 
-		$roles = ['main', 'contacts', 'physical', 'medical', 'mental', 'creative', 'intellect'];
+		$roles = ['main', 'contacts', 'physical', 'medical', 'mental', 'creative', 'intellect', 'admin'];
 		return view('auth.login', compact('roles'));
 	}
 

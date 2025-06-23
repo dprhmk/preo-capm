@@ -10,7 +10,7 @@ class UserSeeder extends Seeder
 {
 	public function run(): void
 	{
-		$roles = ['main', 'contacts', 'physical', 'medical', 'mental', 'creative', 'intellect'];
+		$roles = ['main', 'contacts', 'physical', 'medical', 'mental', 'creative', 'intellect', 'admin'];
 
 		foreach ($roles as $role) {
 			User::query()->create(

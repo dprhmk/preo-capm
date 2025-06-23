@@ -10,27 +10,28 @@ class MemberController
 {
 	public function index()
 	{
-		return view('pages.members');
+		$members = Member::query()->paginate(150);
+
+		return view('pages.members', [
+			'members' => $members
+		]);
 	}
 
 	public function show(Request $request)
 	{
 		$role = auth()->user()->role;
-
 		$code = $request->code;
-
 		$member = Member::where('code', $code)->first();
 
 		return view('pages.member', [
-			'code' => $code,
 			'role' => $role,
+			'code' => $code,
 			'member' => $member,
 		]);
 	}
 
 	public function store(Request $request, MemberService $memberService)
 	{
-		$role = auth()->user()->role;
-		return $memberService->storeSection($request, $role);
+		return $memberService->store($request);
 	}
 }

@@ -2,10 +2,12 @@
 
 @section('head-scripts')
 	<script src="https://unpkg.com/html5-qrcode"></script>
+
+	@stack('partial-head-scripts')
 @endsection
 
 @section('content')
-	<div class="max-w-xl mx-auto mt-10 p-6 bg-white shadow rounded text-center">
+	<div class="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-lg">
 		<h2 class="text-2xl font-bold mb-4">Сканування QR-коду</h2>
 
 		<!-- Виводимо повідомлення про успіх -->
@@ -28,7 +30,7 @@
 
 		<h3 class="text-lg font-semibold mb-2">Або введіть код вручну:</h3>
 		<div class="flex gap-2 justify-center">
-			<input id="manualCodeInput" type="text" placeholder="Введіть код" class="border rounded px-3 py-2 w-2/3">
+			<input id="manualCodeInput" type="text" placeholder="Введіть код" class="border rounded px-3 py-2">
 			<button onclick="handleManualCode()" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
 				Перейти
 			</button>
@@ -91,8 +93,8 @@
 			}
 			error.classList.add('hidden');
 
-			// Форматування посилання — заміни на свою логіку, якщо потрібно
-			const link = `{{ env('APP_URL') }}/member/edit-section/${encodeURIComponent(code)}`;
+
+			const link = `{{ env('APP_URL') }}/member/${encodeURIComponent(code)}`;
 			window.location.href = link;
 		}
 

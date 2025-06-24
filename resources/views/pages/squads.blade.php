@@ -35,12 +35,33 @@
 		@if (!empty($squads))
 			<div class="space-y-6">
 				@foreach ($squads as $squad)
+					@php
+						$physicalScorePercent = $squad->physical_score ? min(($squad->physical_score / (count($squad->members) * 1.5)) * 100, 100) : 0;
+						$mentalScorePercent = $squad->mental_score ? min(($squad->mental_score / (count($squad->members) * 1.5)) * 100, 100) : 0;
+					@endphp
 					<div>
-						<h3 class="text-lg font-semibold text-gray-700 mb-2">{{ $squad->name }}</h3>
+						<div class="flex justify-between items-center mb-4">
+							<h3 class="text-lg font-semibold text-gray-700">{{ $squad->name }}</h3>
+							<div class="flex space-x-6">
+								<div class="flex items-center space-x-2">
+									<span class="text-sm font-medium text-gray-600">Фізична підготовка:</span>
+									<div class="w-24 bg-gray-200 rounded-full h-2.5">
+										<div class="bg-green-600 h-2.5 rounded-full" style="width: {{ $physicalScorePercent }}%"></div>
+									</div>
+									<span class="text-sm text-gray-600">{{ number_format($squad->physical_score, 2) }}</span>
+								</div>
+								<div class="flex items-center space-x-2">
+									<span class="text-sm font-medium text-gray-600">Ментальна креативність:</span>
+									<div class="w-24 bg-gray-200 rounded-full h-2.5">
+										<div class="bg-blue-600 h-2.5 rounded-full" style="width: {{ $mentalScorePercent }}%"></div>
+									</div>
+									<span class="text-sm text-gray-600">{{ number_format($squad->mental_score, 2) }}</span>
+								</div>
+							</div>
+						</div>
 						<p class="text-sm text-gray-600 mb-4">
-							Лідер: {{ $squad['leader_name'] ?? 'Не вказано' }} |
-							Помічник: {{ $squad['assistant_name'] ?? 'Не вказано' }} |
-							Загальні очки: {{ $squad['total_score'] ?? 0 }}
+							Лідер: {{ $squad->leader_name ?? 'Не вказано' }} |
+							Помічник: {{ $squad->assistant_name ?? 'Не вказано' }}
 						</p>
 						<div class="overflow-x-auto rounded-lg">
 							<table class="w-full text-sm text-left text-gray-700">
@@ -49,33 +70,39 @@
 									<th class="px-3 py-2">N°</th>
 									<th class="px-3 py-2">Ім’я</th>
 									<th class="px-3 py-2">Вік</th>
-									<th class="px-3 py-2">Стаж</th>
-									<th class="px-3 py-2">Тип</th>
-									<th class="px-3 py-2">Спритність</th>
-									<th class="px-3 py-2">Музикант</th>
 									<th class="px-3 py-2">Дата народження</th>
+									<th class="px-3 py-2">Фізична підготовка</th>
+									<th class="px-3 py-2">Ментальна креативність</th>
 								</tr>
 								</thead>
 								<tbody>
-								@foreach ($squad['members'] as $member)
+								@foreach ($squad->members as $member)
 									@php
-										$birthDate = $member['birth_date'] ?? null;
+										$birthDate = $member->birth_date ?? null;
 										$isBirthdayWeek = $birthDate &&
 											$birthDate->month == 7 &&
 											$birthDate->day >= 13 &&
 											$birthDate->day <= 19;
 										$age = $birthDate ? $birthDate->diffInYears(now()) : '-';
+										$physicalScorePercent = $member->physical_score ? min(($member->physical_score / 1.5) * 100, 100) : 0;
+										$mentalScorePercent = $member->mental_score ? min(($member->mental_score / 1.5) * 100, 100) : 0;
 									@endphp
 									<tr class="border-b hover:bg-gray-50">
 										<td class="px-3 py-2">{{ $loop->iteration }}</td>
 										<td class="px-3 py-2">{{ $member->full_name ?? 'Невідомо' }}</td>
 										<td class="px-3 py-2">{{ $age }}</td>
-										<td class="px-3 py-2">{{ $member->first_time ? 'Новий' : 'Досвідчений' }}</td>
-										<td class="px-3 py-2">{{ $member->personality_type ?? '-' }}</td>
-										<td class="px-3 py-2">{{ $member->agility_level ?? '-' }}</td>
-										<td class="px-3 py-2">{{ $member->is_musician ? 'Так' : 'Ні' }}</td>
 										<td class="px-3 py-2 {{ $isBirthdayWeek ? 'bg-green-400 rounded-lg' : '' }}">
 											{{ $birthDate ? $birthDate->format('d.m.Y') : '-' }} {{ $isBirthdayWeek ? '🎂' : '' }}
+										</td>
+										<td class="px-3 py-2">
+											<div class="w-24 bg-gray-200 rounded-full h-2.5">
+												<div class="bg-green-600 h-2.5 rounded-full" style="width: {{ $physicalScorePercent }}%"></div>
+											</div>
+										</td>
+										<td class="px-3 py-2">
+											<div class="w-24 bg-gray-200 rounded-full h-2.5">
+												<div class="bg-blue-600 h-2.5 rounded-full" style="width: {{ $mentalScorePercent }}%"></div>
+											</div>
 										</td>
 									</tr>
 								@endforeach
@@ -89,10 +116,4 @@
 			<p class="text-gray-500 text-center">Розподіліть учасників, щоб побачити загони.</p>
 		@endif
 	</div>
-
-	@push('scripts')
-		<script>
-
-		</script>
-	@endpush
 @endsection

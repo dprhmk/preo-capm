@@ -13,7 +13,8 @@ return new class extends Migration
 		    $table->string('name');
 		    $table->string('leader_name')->nullable();
 		    $table->string('assistant_name')->nullable();
-		    $table->decimal('total_score', 8, 2)->nullable();
+		    $table->decimal('physical_score', 8, 2)->nullable();
+		    $table->decimal('mental_score', 8, 2)->nullable();
 		    $table->timestamps();
 	    });
     }

@@ -7,33 +7,10 @@ use App\Models\Squad;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\View\View;
 
 class SquadController
 {
-	private array $weights = [
-		'residence_type' => 0.1,
-		'is_bad_boy' => -0.1,
-		'height_cm' => 0.05,
-		'body_type' => 0.05,
-		'does_sport' => 0.15,
-		'sport_type' => 0.1,
-		'agility_level' => 0.15,
-		'strength_level' => 0.15,
-		'physical_limitations' => -0.1,
-		'first_time' => -0.05,
-		'exceptional' => -0.1,
-		'has_panic_attacks' => -0.1,
-		'personality_type' => 0.15,
-		'artistic_ability' => 0.15,
-		'is_musician' => 0.15,
-		'musical_instruments' => 0.1,
-		'poetic_ability' => 0.15,
-		'english_level' => 0.15,
-		'general_iq_level' => 0.15,
-	];
-
-	public function index(): View
+	public function index()
 	{
 		$squads = Squad::with('members')
 			->get()
@@ -47,7 +24,7 @@ class SquadController
 	public function store(Request $request)
 	{
 		$validator = Validator::make($request->all(), [
-			'squad_count' => 'required|integer',
+			'squad_count' => 'required|integer'
 		]);
 
 		if ($validator->fails()) {
@@ -71,13 +48,15 @@ class SquadController
 		Member::query()->update(['squad_id' => null]);
 
 		foreach ($squads as $index => $squadMembers) {
-			$totalScore = array_sum(array_map(fn ($member) => $this->calculateMemberScore($member), $squadMembers));
+			$physicalScore = array_sum(array_map(fn ($member) => $member->physical_score, $squadMembers));
+			$mentalScore = array_sum(array_map(fn ($member) => $member->mental_score, $squadMembers));
 
 			$squad = Squad::create([
 				'name' => 'Загін ' . ($index + 1),
 				'leader_name' => $leaderNames[$index] ?? null,
 				'assistant_name' => $assistantNames[$index] ?? null,
-				'total_score' => number_format($totalScore, 2),
+				'physical_score' => number_format($physicalScore, 2),
+				'mental_score' => number_format($mentalScore, 2),
 			]);
 
 			foreach ($squadMembers as $member) {
@@ -96,77 +75,69 @@ class SquadController
 
 	private function distributeMembers($members, int $squadCount): array
 	{
+		// Підготовка учасників
 		$scoredMembers = $members->map(fn ($member) => [
 			'member' => $member,
-			'score' => $this->calculateMemberScore($member),
-		])->sortByDesc('score')->values();
+			'physical_score' => $member->physical_score,
+			'mental_score' => $member->mental_score,
+			'height_cm' => $member->height_cm ?? 150,
+			'gender' => $member->gender ?? 'unknown',
+		])->sortByDesc(fn ($scored) => $scored['physical_score'] + $scored['mental_score'])->values();
 
+		// Ініціалізація загонів
 		$squads = array_fill(0, $squadCount, []);
+		$minMembersPerSquad = floor($scoredMembers->count() / $squadCount);
 
+		// Попередній розподіл для рівної кількості
 		foreach ($scoredMembers as $index => $scoredMember) {
-			$squads[$index % $squadCount][] = $scoredMember['member'];
+			$squads[$index % $squadCount][] = $scoredMember;
 		}
 
-		return $this->optimizeSquads($squads);
-	}
-
-	private function calculateMemberScore($member): float
-	{
-		$score = 0;
-		$score += $this->weights['residence_type'] * ($member->residence_type === 'stationary' ? 1 : 0);
-		$score += $this->weights['is_bad_boy'] * ($member->is_bad_boy ? 1 : 0);
-		$score += $this->weights['height_cm'] * ($member->height_cm ? ($member->height_cm - 100) / 100 : 0.5);
-		$bodyTypeMap = ['thin' => 0.5, 'medium' => 1, 'plump' => 0.33];
-		$score += $this->weights['body_type'] * ($member->body_type ? $bodyTypeMap[$member->body_type] : 0.5);
-		$score += $this->weights['does_sport'] * ($member->does_sport ? 1 : 0);
-		$sportScore = $member->sport_type ? (in_array($member->sport_type, ['football', 'volleyball']) ? 1 : 0.5) : 0;
-		$score += $this->weights['sport_type'] * $sportScore;
-		$score += $this->weights['agility_level'] * ($member->agility_level ? ($member->agility_level - 1) / 2 : 0.5);
-		$score += $this->weights['strength_level'] * ($member->strength_level ? ($member->strength_level - 1) / 2 : 0.5);
-		$score += $this->weights['physical_limitations'] * ($member->physical_limitations ? 1 : 0);
-		$score += $this->weights['first_time'] * ($member->first_time ? 1 : 0);
-		$score += $this->weights['exceptional'] * ($member->exceptional ? 1 : 0);
-		$score += $this->weights['has_panic_attacks'] * ($member->has_panic_attacks ? 1 : 0);
-		$personalityMap = ['extrovert' => 1, 'ambivert' => 0.5, 'introvert' => 0];
-		$score += $this->weights['personality_type'] * ($member->personality_type ? $personalityMap[$member->personality_type] : 0.5);
-		$score += $this->weights['artistic_ability'] * ($member->artistic_ability ? ($member->artistic_ability - 1) / 2 : 0.5);
-		$score += $this->weights['is_musician'] * ($member->is_musician ? 1 : 0);
-		$score += $this->weights['musical_instruments'] * ($member->musical_instruments ? 1 : 0);
-		$score += $this->weights['poetic_ability'] * ($member->poetic_ability ? ($member->poetic_ability - 1) / 2 : 0.5);
-		$score += $this->weights['english_level'] * ($member->english_level ? ($member->english_level - 1) / 2 : 0.5);
-		$score += $this->weights['general_iq_level'] * ($member->general_iq_level ? ($member->general_iq_level - 1) / 2 : 0.5);
-
-		return $score;
-	}
-
-	private function optimizeSquads(array $squads): array
-	{
+		// Оптимізація за physical_score, mental_score, height_cm і gender
 		$maxIterations = 100;
 		$iteration = 0;
 
 		while ($iteration < $maxIterations) {
-			$squadScores = $this->calculateSquadScores($squads);
-			$totalScores = array_column($squadScores, 'total');
-
-			if (empty($totalScores) || count($totalScores) <= 1) {
+			$variances = $this->calculateVariances($squads);
+			if ($variances['physical'] < 0.01 && $variances['mental'] < 0.01 && $variances['height'] < 100 && $variances['gender'] < 2) {
 				break;
 			}
 
-			$variance = variance($totalScores);
+			$bestSwap = null;
+			$bestVariance = PHP_INT_MAX;
 
-			if ($variance < 0.01) {
-				break;
+			// Перевіряємо всі можливі обміни
+			for ($i = 0; $i < $squadCount; $i++) {
+				for ($j = $i + 1; $j < $squadCount; $j++) {
+					// Перевіряємо, чи не порушили мінімальну кількість учасників
+					if (count($squads[$i]) <= $minMembersPerSquad || count($squads[$j]) <= $minMembersPerSquad) {
+						continue;
+					}
+
+					foreach (array_keys($squads[$i]) as $memberI) {
+						foreach (array_keys($squads[$j]) as $memberJ) {
+							$tempSquads = $squads;
+							$temp = $tempSquads[$i][$memberI];
+							$tempSquads[$i][$memberI] = $tempSquads[$j][$memberJ];
+							$tempSquads[$j][$memberJ] = $temp;
+
+							$newVariances = $this->calculateVariances($tempSquads);
+							$totalVariance = $newVariances['physical'] + $newVariances['mental'] + ($newVariances['height'] / 100) + ($newVariances['gender'] * 2);
+
+							if ($totalVariance < $bestVariance) {
+								$bestVariance = $totalVariance;
+								$bestSwap = [$i, $memberI, $j, $memberJ];
+							}
+						}
+					}
+				}
 			}
 
-			$maxSquadIndex = array_keys($totalScores, max($totalScores))[0];
-			$minSquadIndex = array_keys($totalScores, min($totalScores))[0];
-
-			$bestSwap = $this->findBestSwap($squads, $maxSquadIndex, $minSquadIndex);
 			if ($bestSwap) {
-				[$maxMemberIndex, $minMemberIndex] = $bestSwap;
-				$temp = $squads[$maxSquadIndex][$maxMemberIndex];
-				$squads[$maxSquadIndex][$maxMemberIndex] = $squads[$minSquadIndex][$minMemberIndex];
-				$squads[$minSquadIndex][$minMemberIndex] = $temp;
+				[$squadI, $memberI, $squadJ, $memberJ] = $bestSwap;
+				$temp = $squads[$squadI][$memberI];
+				$squads[$squadI][$memberI] = $squads[$squadJ][$memberJ];
+				$squads[$squadJ][$memberJ] = $temp;
 			} else {
 				break;
 			}
@@ -174,52 +145,49 @@ class SquadController
 			$iteration++;
 		}
 
-		return $squads;
+		return array_map(fn ($squad) => array_map(fn ($scored) => $scored['member'], $squad), $squads);
 	}
 
-	private function calculateSquadScores(array $squads): array
+	private function calculateVariances(array $squads): array
 	{
-		return array_map(fn ($squad) => [
-			'total' => array_sum(array_map(fn ($member) => $this->calculateMemberScore($member), $squad)),
-			'scores' => array_map(fn ($member) => $this->calculateMemberScore($member), $squad),
-		], $squads);
+		$stats = $this->calculateSquadStats($squads);
+		return [
+			'physical' => $this->variance(array_column($stats, 'physical_score')),
+			'mental' => $this->variance(array_column($stats, 'mental_score')),
+			'height' => $this->variance(array_column($stats, 'avg_height')),
+			'gender' => $this->variance(array_map(fn ($stats) => ($stats['male_count'] ?? 0) - ($stats['female_count'] ?? 0), $stats)),
+		];
 	}
 
-	private function findBestSwap(array $squads, int $maxSquadIndex, int $minSquadIndex): ?array
+	private function calculateSquadStats(array $squads): array
 	{
-		$bestVariance = PHP_INT_MAX;
-		$bestSwap = null;
+		return array_map(function ($squad) {
+			$physicalScore = array_sum(array_map(fn ($scored) => $scored['physical_score'], $squad));
+			$mentalScore = array_sum(array_map(fn ($scored) => $scored['mental_score'], $squad));
+			$heights = array_filter(array_map(fn ($scored) => $scored['height_cm'], $squad));
+			$avgHeight = !empty($heights) ? array_sum($heights) / count($heights) : 150;
+			$maleCount = count(array_filter($squad, fn ($scored) => $scored['gender'] === 'male'));
+			$femaleCount = count(array_filter($squad, fn ($scored) => $scored['gender'] === 'female'));
 
-		foreach (array_keys($squads[$maxSquadIndex]) as $maxMemberIndex) {
-			foreach (array_keys($squads[$minSquadIndex]) as $minMemberIndex) {
-				$tempSquads = $squads;
-				$temp = $tempSquads[$maxSquadIndex][$maxMemberIndex];
-				$tempSquads[$maxSquadIndex][$maxMemberIndex] = $tempSquads[$minSquadIndex][$minMemberIndex];
-				$tempSquads[$minSquadIndex][$minMemberIndex] = $temp;
+			return [
+				'physical_score' => $physicalScore,
+				'mental_score' => $mentalScore,
+				'avg_height' => $avgHeight,
+				'male_count' => $maleCount,
+				'female_count' => $femaleCount,
+			];
+		}, $squads);
+	}
 
-				$tempScores = $this->calculateSquadScores($tempSquads);
-				$variance = variance(array_column($tempScores, 'total'));
-
-				if ($variance < $bestVariance) {
-					$bestVariance = $variance;
-					$bestSwap = [$maxMemberIndex, $minMemberIndex];
-				}
-			}
+	private function variance(array $values): float
+	{
+		if (count($values) <= 1) {
+			return 0;
 		}
 
-		return $bestSwap;
+		$mean = array_sum($values) / count($values);
+		$squaredDiffs = array_map(fn ($value) => pow($value - $mean, 2), $values);
+
+		return array_sum($squaredDiffs) / count($values);
 	}
-}
-
-// Допоміжна функція для обчислення дисперсії
-function variance(array $values): float
-{
-	if (count($values) <= 1) {
-		return 0;
-	}
-
-	$mean = array_sum($values) / count($values);
-	$squaredDiffs = array_map(fn ($value) => pow($value - $mean, 2), $values);
-
-	return array_sum($squaredDiffs) / count($values);
 }

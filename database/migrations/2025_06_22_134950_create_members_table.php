@@ -59,6 +59,9 @@ return new class extends Migration
 			$table->unsignedTinyInteger('english_level')->nullable(); // 1–3
 			$table->unsignedTinyInteger('general_iq_level')->nullable(); // 1–3
 
+			$table->decimal('physical_score', 8, 2)->nullable();
+			$table->decimal('mental_score', 8, 2)->nullable();
+
 			$table->timestamps();
 		});
 	}

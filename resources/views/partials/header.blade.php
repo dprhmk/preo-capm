@@ -1,6 +1,6 @@
 @auth
 	<header class="bg-gray-100 py-4">
-		<div class="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-lg">
+		<div class="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-lg">
 			<div class="flex justify-between items-center">
 				<!-- Лівий блок: База та роль -->
 				<div class="flex items-center space-x-2">
@@ -19,6 +19,10 @@
 						<a href="{{ route('members.index') }}"
 								class="text-blue-600 font-medium hover:text-blue-800 transition hover:underline duration-200">
 							Список учасників
+						</a>
+						<a href="{{ route('squads.index') }}"
+								class="text-blue-600 font-medium hover:text-blue-800 transition hover:underline duration-200">
+							Список загонів
 						</a>
 						<form method="POST" action="{{ route('logout') }}" class="inline">
 							@csrf
@@ -48,6 +52,10 @@
 					<a href="{{ route('members.index') }}"
 							class="text-blue-600 font-medium hover:text-blue-800 transition hover:underline duration-200">
 						Список учасників
+					</a>
+					<a href="{{ route('squads.index') }}"
+							class="text-blue-600 font-medium hover:text-blue-800 transition hover:underline duration-200">
+						Список загонів
 					</a>
 					<form method="POST" action="{{ route('logout') }}">
 						@csrf

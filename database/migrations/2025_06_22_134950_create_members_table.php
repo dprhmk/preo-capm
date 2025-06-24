@@ -11,6 +11,7 @@ return new class extends Migration
 		Schema::create('members', function (Blueprint $table) {
 			$table->id();
 			$table->string('code')->unique();
+			$table->foreignId('squad_id')->nullable()->constrained()->nullOnDelete();
 
 			/** 1. Основна інформація */
 			$table->string('full_name')->nullable();
@@ -44,7 +45,7 @@ return new class extends Migration
 
 			/** 5. Психічне здоровʼя */
 			$table->boolean('first_time')->default(false);
-			$table->string('psychological_diagnosis')->nullable(); // СДВГ, тривожність і тд...
+			$table->boolean('exceptional')->default(false);
 			$table->boolean('has_panic_attacks')->default(false);
 			$table->enum('personality_type', ['extrovert', 'introvert', 'ambivert'])->nullable();
 

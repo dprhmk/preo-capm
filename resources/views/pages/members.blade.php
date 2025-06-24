@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-	<div class="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-lg">
+	<div class="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-lg">
 		<h1 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
 			<span class="mr-2">📋</span> Список учасників
 		</h1>
@@ -9,9 +9,9 @@
 		@if ($members->isEmpty())
 			<p class="text-gray-500 text-center">Учасників не знайдено.</p>
 		@else
-			<div class="overflow-x-auto">
+			<div class="overflow-x-auto rounded-lg">
 				<table class="w-full text-sm text-left text-gray-700">
-					<thead class="text-xs uppercase bg-gray-100 text-gray-600">
+					<thead class="text-xs bg-gray-100 text-gray-600">
 					<tr>
 						<th scope="col" class="px-4 py-2">N°</th>
 						<th scope="col" class="px-4 py-2">Ім’я</th>
@@ -31,7 +31,7 @@
 						<tr class="border-b">
 							<td class="px-4 py-2">{{ $loop->iteration }}</td>
 							<td class="px-4 py-2">{{ $member->full_name ?? 'Невідомо' }}</td>
-							<td class="px-4 py-2 {{ $isBirthdayWeek ? 'bg-green-400' : '' }}">
+							<td class="px-4 py-2 {{ $isBirthdayWeek ? 'bg-green-400 rounded-lg' : '' }}">
 								{{ $birthDate ? $birthDate->format('d.m.Y') : '-' }} {{ $isBirthdayWeek ? '🎂' : '' }}
 							</td>
 							<td class="px-4 py-2">

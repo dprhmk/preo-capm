@@ -5,7 +5,7 @@
 @endpush
 
 @section('content')
-	<div class="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-lg">
+	<div class="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-lg">
 		<h2 class="text-2xl font-bold mb-4">Сканування QR-коду</h2>
 
 		<!-- Виводимо повідомлення про успіх -->

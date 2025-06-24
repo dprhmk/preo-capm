@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\SquadController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\MemberController;
 use Illuminate\Support\Facades\Route;
@@ -15,4 +16,7 @@ Route::middleware(['auth'])->group(function () {
 	Route::get('/member/{code}', [MemberController::class, 'show'])->name('member.edit');
 	Route::get('/members', [MemberController::class, 'index'])->name('members.index');
 	Route::post('/member/{code}', [MemberController::class, 'store'])->name('member.store');
+
+	Route::get('/squads', [SquadController::class, 'index'])->name('squads.index');
+	Route::post('/squads', [SquadController::class, 'store'])->name('squads.store');
 });

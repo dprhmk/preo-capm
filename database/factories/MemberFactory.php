@@ -40,7 +40,7 @@ class MemberFactory extends Factory
 
             'allergy_details' => $this->faker->optional()->sentence(),
             'medical_restrictions' => $this->faker->optional()->sentence(),
-            'physical_limitations' => $this->faker->optional()->sentence(),
+            'physical_limitations' => $this->faker->boolean(),
             'other_health_notes' => $this->faker->optional()->sentence(),
 
 			'first_time' => $this->faker->boolean(30),

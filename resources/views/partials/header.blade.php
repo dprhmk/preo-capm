@@ -1,26 +1,24 @@
-<header class="bg-gray-100 py-4">
-	<div class="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-lg">
-		<div class="flex justify-between items-center">
-			<!-- Лівий блок: База та роль -->
-			<div class="flex items-center space-x-2">
-				@auth
+@auth
+	<header class="bg-gray-100 py-4">
+		<div class="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-lg">
+			<div class="flex justify-between items-center">
+				<!-- Лівий блок: База та роль -->
+				<div class="flex items-center space-x-2">
 					<span class="text-lg font-medium text-gray-700">База:</span>
 					<span class="text-lg font-bold text-blue-600">{{ auth()->user()->role }}</span>
-				@else
-					<span class="text-lg text-gray-500">Неавторизований</span>
-				@endauth
-			</div>
+				</div>
 
-			<div class="flex items-center space-x-4">
-				@auth
-					<nav class="flex items-center space-x-4">
+				<!-- Правий блок: Навігація та бургер-меню -->
+				<div class="flex items-center">
+					<!-- Навігація для десктопу -->
+					<nav class="hidden sm:flex items-center space-x-4">
 						<a href="{{ route('qr.scan') }}"
 								class="text-blue-600 font-medium hover:text-blue-800 transition hover:underline duration-200">
 							Створити
 						</a>
 						<a href="{{ route('members.index') }}"
 								class="text-blue-600 font-medium hover:text-blue-800 transition hover:underline duration-200">
-							Переглянути список усіх
+							Список учасників
 						</a>
 						<form method="POST" action="{{ route('logout') }}" class="inline">
 							@csrf
@@ -30,10 +28,45 @@
 							</button>
 						</form>
 					</nav>
-				@endauth
-				{{-- Майбутні посилання сюди --}}
-				{{-- <a href="{{ route('section.main') }}" class="text-blue-600 hover:text-blue-800 transition">Основна база</a> --}}
+
+					<!-- Бургер-кнопка для мобільних -->
+					<button id="burger-button" class="sm:hidden text-gray-700 focus:outline-none">
+						<svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+						</svg>
+					</button>
+				</div>
+			</div>
+
+			<!-- Випадаюче меню для мобільних -->
+			<div id="burger-menu" class="hidden sm:hidden bg-white border-t border-gray-200 mt-2">
+				<nav class="flex flex-col p-4 space-y-2">
+					<a href="{{ route('qr.scan') }}"
+							class="text-blue-600 font-medium hover:text-blue-800 transition hover:underline duration-200">
+						Створити
+					</a>
+					<a href="{{ route('members.index') }}"
+							class="text-blue-600 font-medium hover:text-blue-800 transition hover:underline duration-200">
+						Список учасників
+					</a>
+					<form method="POST" action="{{ route('logout') }}">
+						@csrf
+						<button type="submit"
+								class="text-red-600 font-medium hover:text-red-800 transition hover:underline duration-200 text-left">
+							Вийти
+						</button>
+					</form>
+				</nav>
 			</div>
 		</div>
-	</div>
-</header>
+	</header>
+
+	@push('scripts')
+		<script>
+			document.getElementById('burger-button').addEventListener('click', () => {
+				const menu = document.getElementById('burger-menu');
+				menu.classList.toggle('hidden');
+			});
+		</script>
+	@endpush
+@endauth

@@ -1,11 +1,7 @@
 @extends('layouts.app')
 
-@section('head-scripts')
-	@stack('partial-head-scripts')
-@endsection
-
 @section('content')
-	<div class="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-lg">
+	<div class="max-w-2xl mx-auto mb-16 p-6 bg-white rounded-lg shadow-lg">
 		<!-- Заголовок із ім’ям -->
 		<div class="mb-8 text-center">
 			<h1 class="text-3xl font-extrabold text-blue-600 drop-shadow-md">
@@ -46,10 +42,8 @@
 	</div>
 @endsection
 
-@section('scripts')
+@push('scripts')
 	<script>
 		// Скрипти поки не потрібні
 	</script>
-
-	@stack('partial-scripts')
-@endsection
+@endpush

@@ -1,6 +1,6 @@
 @if(in_array( $role, ['admin', 'main']))
-	@push('partial-head-scripts')
-		///
+	@push('head-scripts')
+
 	@endpush
 
 	<hr class="my-6 mt-16">
@@ -28,15 +28,6 @@
 		@enderror
 	</div>
 	<div class="mb-4">
-		<label class="block font-medium text-gray-700 mb-1">Вік</label>
-		<input type="number" name="age" inputmode="numeric" value="{{ old('age', $member?->age) }}"
-				class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500
-		                              @error('age') border-red-500 @enderror" required>
-		@error('age')
-		<p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-		@enderror
-	</div>
-	<div class="mb-4">
 		<label class="block font-medium">Стать</label>
 		<select name="gender" class="w-full border rounded px-3 py-2 @error('gender') border-red-500 @enderror" required>
 			<option value="">Не вказано</option>
@@ -59,7 +50,7 @@
 		@enderror
 	</div>
 
-	@push('partial-scripts')
+	@push('scripts')
 		<script>
 
 		</script>

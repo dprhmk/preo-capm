@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-	<div class="max-w-2xl mx-auto p-4 bg-white rounded-b-lg shadow-lg">
+	<div class="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-lg">
 		<h1 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
 			<span class="mr-2">📋</span> Список учасників
 		</h1>
@@ -15,7 +15,6 @@
 					<tr>
 						<th scope="col" class="px-4 py-2">N°</th>
 						<th scope="col" class="px-4 py-2">Ім’я</th>
-						<th scope="col" class="px-4 py-2">Вік</th>
 						<th scope="col" class="px-4 py-2">Дата народження</th>
 						<th scope="col" class="px-4 py-2">Дії</th>
 					</tr>
@@ -29,12 +28,11 @@
 								$birthDate->day >= 13 &&
 								$birthDate->day <= 19;
 						@endphp
-						<tr class="border-b {{ $isBirthdayWeek ? 'bg-yellow-100' : '' }}">
+						<tr class="border-b">
 							<td class="px-4 py-2">{{ $loop->iteration }}</td>
 							<td class="px-4 py-2">{{ $member->full_name ?? 'Невідомо' }}</td>
-							<td class="px-4 py-2">{{ $member->age ?? '-' }}</td>
-							<td class="px-4 py-2">
-								{{ $birthDate ? $birthDate->format('d.m.Y') : '-' }} {{ $isBirthdayWeek ? '🎈🎉🎂' : '' }}
+							<td class="px-4 py-2 {{ $isBirthdayWeek ? 'bg-green-400' : '' }}">
+								{{ $birthDate ? $birthDate->format('d.m.Y') : '-' }} {{ $isBirthdayWeek ? '🎂' : '' }}
 							</td>
 							<td class="px-4 py-2">
 								<a href="{{ route('member.edit', $member->code) }}"

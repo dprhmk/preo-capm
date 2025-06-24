@@ -112,7 +112,7 @@
 		@enderror
 	</div>
 
-	@push('partial-scripts')
+	@push('scripts')
 		<script>
 			document.addEventListener('DOMContentLoaded', () => {
 				const captureButton = document.getElementById('capture-photo');

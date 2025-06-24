@@ -8,13 +8,13 @@
 
 	@vite(['resources/css/app.css', 'resources/js/app.js'])
 
-	@yield('head-scripts')
+	@stack('head-scripts')
 </head>
 <body class="bg-gray-100">
 	@include('partials.header')
 
 	@yield('content')
 
-	@yield('scripts')
+	@stack('scripts')
 </body>
 </html>

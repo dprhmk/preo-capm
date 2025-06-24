@@ -53,7 +53,6 @@ class MemberService
 			$rules = array_merge([
 				'full_name'      => 'required|string|max:255',
 				'birth_date'     => 'required|date',
-				'age'            => 'required|numeric',
 				'gender'         => 'required|in:male,female',
 				'residence_type' => 'required|in:stationary,non-stationary',
 			], $rules);

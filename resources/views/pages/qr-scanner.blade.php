@@ -1,10 +1,8 @@
 @extends('layouts.app')
 
-@section('head-scripts')
+@push('head-scripts')
 	<script src="https://unpkg.com/html5-qrcode"></script>
-
-	@stack('partial-head-scripts')
-@endsection
+@endpush
 
 @section('content')
 	<div class="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-lg">
@@ -39,7 +37,7 @@
 	</div>
 @endsection
 
-@section('scripts')
+@push('scripts')
 	<script>
 		let html5QrCode;
 		const resultContainer = document.getElementById("qr-reader-results");
@@ -131,4 +129,4 @@
 			});
 		});
 	</script>
-@endsection
+@endpush

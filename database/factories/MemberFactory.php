@@ -16,7 +16,6 @@ class MemberFactory extends Factory
 			'code' => strtoupper(Str::random(8)),
 			'full_name' => $this->faker->name(),
             'birth_date' => $this->faker->dateTimeBetween('-18 years', '-12 years')->format('Y-m-d'),
-            'age' => $this->faker->numberBetween(12, 18),
             'gender' => $this->faker->randomElement(['male', 'female']),
             'residence_type' => $this->faker->randomElement(['stationary', 'non-stationary']),
             'is_bad_boy' => $this->faker->boolean(10),

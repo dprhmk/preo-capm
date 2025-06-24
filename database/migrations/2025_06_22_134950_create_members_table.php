@@ -15,7 +15,6 @@ return new class extends Migration
 			/** 1. Основна інформація */
 			$table->string('full_name')->nullable();
 			$table->date('birth_date')->nullable();
-			$table->unsignedInteger('age')->nullable();
 			$table->enum('gender', ['male', 'female'])->nullable();
 			$table->enum('residence_type', ['stationary', 'non-stationary'])->nullable();
 			$table->boolean('is_bad_boy')->default(false);

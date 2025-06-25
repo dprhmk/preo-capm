@@ -4,29 +4,21 @@
 		<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
 	@endpush
 
-
-
 		<h2 class="text-base sm:text-lg font-semibold text-gray-800 mb-2 sm:mb-3 flex items-center">
 			<span class="mr-2">📊</span> Аналітика загонів
 		</h2>
 
 		<div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-16">
-			<!-- Круговий графік: Розподіл учасників -->
+			<!-- Стовпчиковий графік: Вікові групи -->
 			<div class="bg-white p-4 rounded-lg shadow-sm overflow-hidden">
-				<h3 class="text-xs sm:text-sm font-semibold text-gray-600 mb-1">Розподіл учасників</h3>
-				<canvas id="memberChart" class="w-full"></canvas>
+				<h3 class="text-xs sm:text-sm font-semibold text-gray-600 mb-1">Розподіл за віком</h3>
+				<canvas id="ageChart" class="w-full"></canvas>
 			</div>
 
 			<!-- Стовпчиковий графік: Бали загонів -->
 			<div class="bg-white p-4 rounded-lg shadow-sm overflow-hidden">
 				<h3 class="text-xs sm:text-sm font-semibold text-gray-600 mb-1">Бали загонів</h3>
 				<canvas id="scoresChart" class="w-full"></canvas>
-			</div>
-
-			<!-- Стовпчиковий графік: Вікові групи -->
-			<div class="bg-white p-4 rounded-lg shadow-sm overflow-hidden">
-				<h3 class="text-xs sm:text-sm font-semibold text-gray-600 mb-1">Розподіл за віком</h3>
-				<canvas id="ageChart" class="w-full"></canvas>
 			</div>
 
 			<!-- Кругові графіки: Гендер -->
@@ -56,6 +48,19 @@
 					</div>
 				</div>
 			</div>
+
+			<!-- Стовпчиковий графік: Non-stationary учасники -->
+			<div class="bg-white p-4 rounded-lg shadow-sm overflow-hidden">
+				<h3 class="text-xs sm:text-sm font-semibold text-gray-600 mb-1">Не стаціонарні учасники (Загінецькі)</h3>
+				<canvas id="nonStationaryChart" class="w-full"></canvas>
+			</div>
+
+			<!-- Круговий графік: Розподіл учасників -->
+			<div class="bg-white p-4 rounded-lg shadow-sm overflow-hidden">
+				<h3 class="text-xs sm:text-sm font-semibold text-gray-600 mb-1">Розподіл учасників</h3>
+				<canvas id="memberChart" class="w-full"></canvas>
+			</div>
+
 		</div>
 
 
@@ -71,6 +76,33 @@
 				'rgba(153, 102, 255, 0.8)', // Фіолетовий
 				'rgba(255, 159, 64, 0.8)'   // Помаранчевий
 			];
+
+			// Стовпчиковий графік: Non-stationary учасники
+			new Chart(document.getElementById('nonStationaryChart'), {
+				type: 'bar',
+				data: {
+					labels: @json($analyticsData['labels']),
+					datasets: [{
+						label: 'Не стаціонарні',
+						data: @json($analyticsData['non_stationary_counts']),
+						backgroundColor: 'rgba(153, 102, 255, 0.8)',
+						barThickness: window.innerWidth < 640 ? 8 : 16,
+					}]
+				},
+				options: {
+					plugins: {
+						legend: {
+							display: false,
+							position: 'bottom',
+						},
+						datalabels: {
+							font: {
+								size: 16
+							}
+						}
+					}
+				}
+			});
 
 			// Круговий графік: Розподіл учасників
 			new Chart(document.getElementById('memberChart'), {

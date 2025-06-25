@@ -8,161 +8,141 @@ class SquadDistributionService
 {
 	public function distribute(Collection $members, int $squadCount): array
 	{
-		if ($members->count() < $squadCount) {
+		if ($members->isEmpty() || $squadCount < 1 || $squadCount > $members->count()) {
 			return array_fill(0, $squadCount, []);
 		}
 
-		$totalMembers = $members->count();
-		$baseMembersPerSquad = (int) floor($totalMembers / $squadCount);
-		$extraMembers = $totalMembers % $squadCount;
+		$now = now();
+		// Підготовка даних
+		$processed = $members->map(fn($m) => (object)[
+			'member' => $m,
+			'age' => $m->birth_date ? $now->diffInYears($m->birth_date) : 0,
+			'gender' => $m->gender ?? 'unknown',
+			'residence_type' => $m->residence_type ?? 'unknown',
+			'physical_score' => $m->physical_score ?? 0,
+			'mental_score' => $m->mental_score ?? 0,
+		])->shuffle();
 
-		// Розділити учасників за статтю
-		$males = $members->filter(fn($m) => $m->gender === 'male')->shuffle()->values();
-		$females = $members->filter(fn($m) => $m->gender !== 'male')->shuffle()->values();
+		// Визначення розмірів загонів
+		$total = $members->count();
+		$baseSize = intdiv($total, $squadCount);
+		$extra = $total % $squadCount;
+		$targets = array_map(fn($i) => $baseSize + ($i < $extra ? 1 : 0), range(0, $squadCount - 1));
 
+		// Початковий розподіл
 		$squads = array_fill(0, $squadCount, []);
+		$index = 0;
+		$forward = true;
 
-		// Початковий розподіл для рівномірного гендерного балансу
-		$maleIndex = 0;
-		$femaleIndex = 0;
-		$malesPerSquad = (int) floor($males->count() / $squadCount);
-		$femalesPerSquad = (int) floor($females->count() / $squadCount);
-		$extraMales = $males->count() % $squadCount;
-		$extraFemales = $females->count() % $squadCount;
-
-		for ($i = 0; $i < $squadCount; ++$i) {
-			// Розподіл чоловіків
-			$malesForThisSquad = $malesPerSquad + ($i < $extraMales ? 1 : 0);
-			for ($j = 0; $j < $malesForThisSquad && $maleIndex < $males->count(); ++$j) {
-				$squads[$i][] = $males[$maleIndex];
-				++$maleIndex;
+		// Розподіл non-stationary (сортуємо за віком)
+		$nonStationary = $processed->filter(fn($p) => $p->residence_type === 'non-stationary')->sortBy('age');
+		foreach ($nonStationary as $data) {
+			while (count($squads[$index]) >= $targets[$index]) {
+				$index = $forward ? $index + 1 : $index - 1;
+				if ($index >= $squadCount || $index < 0) {
+					$forward = !$forward;
+					$index = $forward ? 0 : $squadCount - 1;
+				}
 			}
-			// Розподіл жінок
-			$femalesForThisSquad = $femalesPerSquad + ($i < $extraFemales ? 1 : 0);
-			for ($j = 0; $j < $femalesForThisSquad && $femaleIndex < $females->count(); ++$j) {
-				$squads[$i][] = $females[$femaleIndex];
-				++$femaleIndex;
+			$squads[$index][] = $data->member;
+			$index = $forward ? $index + 1 : $index - 1;
+			if ($index >= $squadCount || $index < 0) {
+				$forward = !$forward;
+				$index = $forward ? 0 : $squadCount - 1;
 			}
 		}
 
-		// Балансування
-		$maxIterations = 50; // Збільшено для точнішого балансу
-		for ($iteration = 0; $iteration < $maxIterations; ++$iteration) {
-			$stats = $this->calculateSquadStats($squads);
-			$variances = $this->calculateVariances($stats);
+		// Розподіл решти (групуємо за гендером і віком)
+		$others = $processed->reject(fn($p) => $p->residence_type === 'non-stationary')
+			->groupBy('gender')->map->sortBy('age')->flatten(1);
+		foreach ($others as $data) {
+			while (count($squads[$index]) >= $targets[$index]) {
+				$index = $forward ? $index + 1 : $index - 1;
+				if ($index >= $squadCount || $index < 0) {
+					$forward = !$forward;
+					$index = $forward ? 0 : $squadCount - 1;
+				}
+			}
+			$squads[$index][] = $data->member;
+			$index = $forward ? $index + 1 : $index - 1;
+			if ($index >= $squadCount || $index < 0) {
+				$forward = !$forward;
+				$index = $forward ? 0 : $squadCount - 1;
+			}
+		}
 
+		// Балансування (до 3 обмінів)
+		for ($swap = 0; $swap < 3; ++$swap) {
+			$stats = $this->stats($squads);
 			if (
-				$variances['physical'] < 100 &&
-				$variances['mental'] < 100 &&
-				$variances['age'] < 1 &&
-				$variances['male_count'] < 0.1 // Жорсткіший поріг
+				$stats['variances']['age'] <= 0.5 &&
+				$stats['variances']['male_count'] <= 0.05 &&
+				$stats['variances']['non_stationary_count'] <= 0.05 &&
+				$stats['variances']['physical'] <= 100 &&
+				$stats['variances']['mental'] <= 100
 			) {
 				break;
 			}
-
-			$bestSwap = $this->findBestSwap($squads, $baseMembersPerSquad, $extraMembers);
-			if ($bestSwap === null) {
-				break;
-			}
-
-			[$squadI, $memberI, $squadJ, $memberJ] = $bestSwap;
-			$temp = $squads[$squadI][$memberI];
-			$squads[$squadI][$memberI] = $squads[$squadJ][$memberJ];
-			$squads[$squadJ][$memberJ] = $temp;
-		}
-
-		return $squads;
-	}
-
-	public function calculateSquadStats(array $squads): array
-	{
-		return array_map(function ($squad) {
-			$count = count($squad);
-			if ($count === 0) {
-				return [
-					'physical' => 0,
-					'mental' => 0,
-					'avg_age' => 0,
-					'male_count' => 0,
-				];
-			}
-
-			$physical = array_sum(array_map(fn ($m) => is_array($m) ? ($m['physical_score'] ?? 0) : ($m->physical_score ?? 0), $squad)) / $count;
-			$mental = array_sum(array_map(fn ($m) => is_array($m) ? ($m['mental_score'] ?? 0) : ($m->mental_score ?? 0), $squad)) / $count;
-			$ages = array_filter(array_map(fn ($m) => $m['birth_date'] ? now()->diffInYears($m['birth_date']) : null, $squad));
-			$avgAge = !empty($ages) ? array_sum($ages) / count($ages) : 0;
-			$maleCount = count(array_filter($squad, fn ($m) => (is_array($m) ? ($m['gender'] ?? '') : ($m->gender ?? '')) === 'male'));
-
-			return [
-				'physical' => $physical,
-				'mental' => $mental,
-				'avg_age' => $avgAge,
-				'male_count' => $maleCount,
-			];
-		}, $squads);
-	}
-
-	private function calculateVariances(array $stats): array
-	{
-		return [
-			'physical' => $this->variance(array_column($stats, 'physical')),
-			'mental' => $this->variance(array_column($stats, 'mental')),
-			'age' => $this->variance(array_column($stats, 'avg_age')),
-			'male_count' => $this->variance(array_column($stats, 'male_count')),
-		];
-	}
-
-	private function variance(array $values): float
-	{
-		if (count($values) <= 1) {
-			return 0;
-		}
-
-		$mean = array_sum($values) / count($values);
-		$squaredDiffs = array_map(fn ($value) => ($value - $mean) ** 2, $values);
-
-		return array_sum($squaredDiffs) / count($values);
-	}
-
-	private function findBestSwap(array $squads, int $baseMembersPerSquad, int $extraMembers): ?array
-	{
-		$squadCount = count($squads);
-		$bestSwap = null;
-		$bestVariance = PHP_INT_MAX;
-
-		for ($i = 0; $i < $squadCount; ++$i) {
-			for ($j = $i + 1; $j < $squadCount; ++$j) {
-				$minMembersI = $baseMembersPerSquad + ($i < $extraMembers ? 1 : 0);
-				$minMembersJ = $baseMembersPerSquad + ($j < $extraMembers ? 1 : 0);
-
-				if (count($squads[$i]) <= $minMembersI || count($squads[$j]) <= $minMembersJ) {
-					continue;
-				}
-
-				foreach (array_keys($squads[$i]) as $memberI) {
-					foreach (array_keys($squads[$j]) as $memberJ) {
-						$tempSquads = $squads;
-						$temp = $tempSquads[$i][$memberI];
-						$tempSquads[$i][$memberI] = $tempSquads[$j][$memberJ];
-						$tempSquads[$j][$memberJ] = $temp;
-
-						$newStats = $this->calculateSquadStats($tempSquads);
-						$newVariances = $this->calculateVariances($newStats);
-						$totalVariance =
-							$newVariances['physical'] * 10 +
-							$newVariances['mental'] * 10 +
-							$newVariances['age'] +
-							$newVariances['male_count'] * 10; // Збільшена вага
-
-						if ($totalVariance < $bestVariance) {
-							$bestVariance = $totalVariance;
-							$bestSwap = [$i, $memberI, $j, $memberJ];
+			$bestSwap = null;
+			$bestScore = INF;
+			for ($i = 0; $i < $squadCount - 1; ++$i) {
+				for ($j = 0; $j < count($squads[$i]); ++$j) {
+					for ($k = $i + 1; $k < $squadCount; ++$k) {
+						for ($l = 0; $l < count($squads[$k]); ++$l) {
+							$temp = $squads;
+							[$temp[$i][$j], $temp[$k][$l]] = [$temp[$k][$l], $temp[$i][$j]];
+							$newStats = $this->stats($temp);
+							$score = $newStats['variances']['age'] * 100 +
+								$newStats['variances']['male_count'] * 100 +
+								$newStats['variances']['non_stationary_count'] * 100 +
+								$newStats['variances']['physical'] * 10 +
+								$newStats['variances']['mental'] * 10;
+							if ($score < $bestScore) {
+								$bestScore = $score;
+								$bestSwap = [$i, $j, $k, $l];
+							}
 						}
 					}
 				}
 			}
+			if (!$bestSwap) {
+				\Log::warning('No swap found', ['stats' => $stats['variances']]);
+				break;
+			}
+			[$i, $j, $k, $l] = $bestSwap;
+			[$squads[$i][$j], $squads[$k][$l]] = [$squads[$k][$l], $squads[$i][$j]];
 		}
 
-		return $bestSwap;
+		// Логування для діагностики
+		$stats = $this->stats($squads);
+		\Log::info('Distribution stats', ['variances' => $stats['variances'], 'sizes' => array_map('count', $squads)]);
+
+		return $squads;
+	}
+
+	private function stats(array $squads): array
+	{
+		$means = array_map(function ($squad) {
+			$count = count($squad) ?: 1;
+			$ages = array_filter(array_map(fn($m) => $m->birth_date ? now()->diffInYears($m->birth_date) : 0, $squad));
+			return [
+				'age' => $ages ? array_sum($ages) / count($ages) : 0,
+				'male_count' => count(array_filter($squad, fn($m) => $m->gender === 'male')) / $count,
+				'non_stationary_count' => count(array_filter($squad, fn($m) => $m->residence_type === 'non-stationary')) / $count,
+				'physical' => array_sum(array_map(fn($m) => $m->physical_score ?? 0, $squad)) / $count,
+				'mental' => array_sum(array_map(fn($m) => $m->mental_score ?? 0, $squad)) / $count,
+			];
+		}, $squads);
+
+		$variances = [];
+		foreach (['age', 'male_count', 'non_stationary_count', 'physical', 'mental'] as $key) {
+			$avg = array_sum(array_column($means, $key)) / count($means);
+			$variances[$key] = count($means) <= 1 ? 0 : array_sum(array_map(
+					fn($m) => ($m[$key] - $avg) ** 2,
+					$means
+				)) / count($means);
+		}
+
+		return ['means' => $means, 'variances' => $variances];
 	}
 }

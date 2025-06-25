@@ -25,7 +25,7 @@ class SquadAnalyticsService
 				foreach ($squad as $member) {
 					$birthDate = $member['birth_date'] ?? null;
 					if ($birthDate) {
-						$age = Carbon::parse($birthDate)->diffInYears(Carbon::now());
+						$age = (int)floor(Carbon::parse($birthDate)->diffInYears(Carbon::now()));
 						if ($age <= 12) $ageBuckets['11-12']++;
 						elseif ($age >= 13 && $age <= 14) $ageBuckets['13-14']++;
 						elseif ($age >= 15 && $age <= 16) $ageBuckets['15-16']++;
@@ -48,6 +48,11 @@ class SquadAnalyticsService
 				];
 			}, $squadsArray);
 
+			// Non-stationary учасники в кожному загоні
+			$nonStationaryCounts = array_map(function ($squad) {
+				return count(array_filter($squad, fn ($m) => ($m['residence_type'] ?? null) === 'non-stationary'));
+			}, $squadsArray);
+
 			// Максимальний бал для шкали
 			$maxSquadScorePercent = $squads->pluck('members')->max()->count() * 100;
 
@@ -58,6 +63,7 @@ class SquadAnalyticsService
 				'age_groups' => $ageGroups,
 				'gender_percentages' => $genderPercentages,
 				'member_counts' => $squads->map(fn($squad) => count($squad->members))->toArray(),
+				'non_stationary_counts' => $nonStationaryCounts,
 				'max_squad_score_percent' => $maxSquadScorePercent,
 			];
 		}

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Squad;
 use App\Models\Member;
+use App\Services\SquadAnalyticsService;
 use App\Services\SquadDistributionService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -11,11 +12,16 @@ use Illuminate\Support\Facades\Schema;
 
 class SquadController
 {
-	private $distributionService;
+	protected SquadDistributionService $squadDistributionService;
+	protected SquadAnalyticsService $squadAnalyticsService;
 
-	public function __construct(SquadDistributionService $distributionService)
+	public function __construct(
+		SquadDistributionService $squadDistributionService,
+		SquadAnalyticsService $squadAnalyticsService
+	)
 	{
-		$this->distributionService = $distributionService;
+		$this->squadDistributionService = $squadDistributionService;
+		$this->squadAnalyticsService = $squadAnalyticsService;
 	}
 
 	public function index()
@@ -28,8 +34,11 @@ class SquadController
 			->map(fn ($squad) => $squad->first())
 			->values();
 
+		$analyticsData = $this->squadAnalyticsService->getAnalytics($squads);
+
 		return view('pages.squads', [
 			'squads' => $squads,
+			'analyticsData' => $analyticsData,
 		]);
 	}
 
@@ -57,7 +66,7 @@ class SquadController
 			return view('pages.squads', ['squads' => []]);
 		}
 
-		$squadMembersList = $this->distributionService->distribute($members, $squadCount);
+		$squadMembersList = $this->squadDistributionService->distribute($members, $squadCount);
 
 		foreach ($squadMembersList as $index => $squadMembers) {
 			$physicalScore = array_sum(array_map(fn ($m) => $m->physical_score ?? 0, $squadMembers));
@@ -76,10 +85,6 @@ class SquadController
 			}
 		}
 
-		$squads = Squad::with(['members' => function ($query) {
-			$query->orderByRaw("`physical_score` + `mental_score` DESC");
-		}])->get();
-
-		return view('pages.squads', compact('squads'));
+		return redirect()->route('squads.index');
 	}
 }

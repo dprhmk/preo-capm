@@ -12,25 +12,41 @@ class SquadDistributionService
 			return array_fill(0, $squadCount, []);
 		}
 
-		$shuffledMembers = $members->shuffle()->values();
-		$totalMembers = $shuffledMembers->count();
+		$totalMembers = $members->count();
 		$baseMembersPerSquad = (int) floor($totalMembers / $squadCount);
 		$extraMembers = $totalMembers % $squadCount;
 
+		// Розділити учасників за статтю
+		$males = $members->filter(fn($m) => $m->gender === 'male')->shuffle()->values();
+		$females = $members->filter(fn($m) => $m->gender !== 'male')->shuffle()->values();
+
 		$squads = array_fill(0, $squadCount, []);
 
-		// Початковий розподіл
-		$memberIndex = 0;
+		// Початковий розподіл для рівномірного гендерного балансу
+		$maleIndex = 0;
+		$femaleIndex = 0;
+		$malesPerSquad = (int) floor($males->count() / $squadCount);
+		$femalesPerSquad = (int) floor($females->count() / $squadCount);
+		$extraMales = $males->count() % $squadCount;
+		$extraFemales = $females->count() % $squadCount;
+
 		for ($i = 0; $i < $squadCount; ++$i) {
-			$membersForThisSquad = $baseMembersPerSquad + ($i < $extraMembers ? 1 : 0);
-			for ($j = 0; $j < $membersForThisSquad && $memberIndex < $totalMembers; ++$j) {
-				$squads[$i][] = $shuffledMembers[$memberIndex];
-				++$memberIndex;
+			// Розподіл чоловіків
+			$malesForThisSquad = $malesPerSquad + ($i < $extraMales ? 1 : 0);
+			for ($j = 0; $j < $malesForThisSquad && $maleIndex < $males->count(); ++$j) {
+				$squads[$i][] = $males[$maleIndex];
+				++$maleIndex;
+			}
+			// Розподіл жінок
+			$femalesForThisSquad = $femalesPerSquad + ($i < $extraFemales ? 1 : 0);
+			for ($j = 0; $j < $femalesForThisSquad && $femaleIndex < $females->count(); ++$j) {
+				$squads[$i][] = $females[$femaleIndex];
+				++$femaleIndex;
 			}
 		}
 
 		// Балансування
-		$maxIterations = 30;
+		$maxIterations = 50; // Збільшено для точнішого балансу
 		for ($iteration = 0; $iteration < $maxIterations; ++$iteration) {
 			$stats = $this->calculateSquadStats($squads);
 			$variances = $this->calculateVariances($stats);
@@ -39,7 +55,7 @@ class SquadDistributionService
 				$variances['physical'] < 100 &&
 				$variances['mental'] < 100 &&
 				$variances['age'] < 1 &&
-				$variances['male_count'] < 0.5
+				$variances['male_count'] < 0.1 // Жорсткіший поріг
 			) {
 				break;
 			}
@@ -60,8 +76,8 @@ class SquadDistributionService
 
 	public function calculateSquadStats(array $squads): array
 	{
-		return array_map(function ($member) {
-			$count = count($member);
+		return array_map(function ($squad) {
+			$count = count($squad);
 			if ($count === 0) {
 				return [
 					'physical' => 0,
@@ -71,11 +87,11 @@ class SquadDistributionService
 				];
 			}
 
-			$physical = array_sum(array_map(fn ($m) => $m->physical_score ?? 0, $member)) / $count;
-			$mental = array_sum(array_map(fn ($m) => $m->mental_score ?? 0, $member)) / $count;
-			$ages = array_filter(array_map(fn ($m) => $m->birth_date ? now()->diffInYears($m->birth_date) : null, $member));
+			$physical = array_sum(array_map(fn ($m) => is_array($m) ? ($m['physical_score'] ?? 0) : ($m->physical_score ?? 0), $squad)) / $count;
+			$mental = array_sum(array_map(fn ($m) => is_array($m) ? ($m['mental_score'] ?? 0) : ($m->mental_score ?? 0), $squad)) / $count;
+			$ages = array_filter(array_map(fn ($m) => $m['birth_date'] ? now()->diffInYears($m['birth_date']) : null, $squad));
 			$avgAge = !empty($ages) ? array_sum($ages) / count($ages) : 0;
-			$maleCount = count(array_filter($member, fn ($m) => $m->gender === 'male'));
+			$maleCount = count(array_filter($squad, fn ($m) => (is_array($m) ? ($m['gender'] ?? '') : ($m->gender ?? '')) === 'male'));
 
 			return [
 				'physical' => $physical,
@@ -136,7 +152,7 @@ class SquadDistributionService
 							$newVariances['physical'] * 10 +
 							$newVariances['mental'] * 10 +
 							$newVariances['age'] +
-							$newVariances['male_count'] * 2;
+							$newVariances['male_count'] * 10; // Збільшена вага
 
 						if ($totalVariance < $bestVariance) {
 							$bestVariance = $totalVariance;

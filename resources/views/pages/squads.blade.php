@@ -31,13 +31,20 @@
 			</div>
 		</form>
 
+		@include('partials.squads-analytics')
+
 		<!-- Результати розподілу -->
 		@if (!empty($squads))
 			<div class="space-y-4 sm:space-y-6">
+
+				@php
+					$maxSquadScorePercent = $squads?->pluck('members')->max()?->count() * 100;
+				@endphp
+
 				@foreach ($squads as $squad)
 					@php
-						$physicalScorePercent = $squad->physical_score / max($squad->members->count(), 1);
-						$mentalScorePercent = $squad->mental_score / max($squad->members->count(), 1);
+						$physicalScorePercent = ($squad->physical_score * 100) / $maxSquadScorePercent;
+						$mentalScorePercent = ($squad->mental_score * 100) / $maxSquadScorePercent;
 					@endphp
 					<div>
 						<div class="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-2 sm:mb-4">

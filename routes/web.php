@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\SquadAnalyticsController;
 use App\Http\Controllers\SquadController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\MemberController;
@@ -19,4 +20,6 @@ Route::middleware(['auth'])->group(function () {
 
 	Route::get('/squads', [SquadController::class, 'index'])->name('squads.index');
 	Route::post('/squads', [SquadController::class, 'store'])->name('squads.store');
+
+	Route::get('/squads/analytics', [SquadAnalyticsController::class, 'index'])->name('squads.analytics');
 });

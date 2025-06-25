@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Member;
+use App\Models\Squad;
 use App\Services\MemberService;
 use Illuminate\Http\Request;
 
@@ -22,11 +23,13 @@ class MemberController
 		$role = auth()->user()->role;
 		$code = $request->code;
 		$member = Member::where('code', $code)->first();
+		$squads = Squad::query()->get();
 
 		return view('pages.member', [
 			'role' => $role,
 			'code' => $code,
 			'member' => $member,
+			'squads' => $squads
 		]);
 	}
 

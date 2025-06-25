@@ -38,6 +38,14 @@ class MemberService
 			$validated
 		);
 
+		$squad = $member->squad;
+		if($squad) {
+			$members = $squad->members;
+			$squad->physical_score = $members->pluck('physical_score')->sum();
+			$squad->mental_score = $members->pluck('mental_score')->sum();
+			$squad->save();
+		}
+
 		return redirect()
 			->route('qr.scan')
 			->with('success', 'Дані ' . $member->full_name . ' успішно збережено!');

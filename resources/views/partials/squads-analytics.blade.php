@@ -155,33 +155,26 @@
 				}
 			});
 
+			@php
+				$colorGradient = 240;
+			@endphp
+
 			// Стовпчиковий графік: Вікові групи
 			new Chart(document.getElementById('ageChart'), {
 				type: 'bar',
 				data: {
 					labels: @json($analyticsData['labels']),
 					datasets: [
-						{
-							label: '11-12',
-							data: @json(array_column($analyticsData['age_groups'], '11-12')),
-							backgroundColor: 'rgba(202,202,202,0.8)',
-						},
-						{
-							label: '13-14',
-							data: @json(array_column($analyticsData['age_groups'], '13-14')),
-							backgroundColor: 'rgba(168,168,168,0.8)',
-						},
-						{
-							label: '15-16',
-							data: @json(array_column($analyticsData['age_groups'], '15-16')),
-							backgroundColor: 'rgba(135,135,135,0.8)',
-
-						},
-						{
-							label: '17-18',
-							data: @json(array_column($analyticsData['age_groups'], '17-18')),
-							backgroundColor: 'rgba(106,106,106,0.8)',
-						}
+						@foreach (array_keys($analyticsData['age_groups'][0] ?? []) as $ageGroup)
+							@php
+								$colorGradient -= 25;
+							@endphp
+							{
+								label: @json($ageGroup),
+								data: @json(array_column($analyticsData['age_groups'], $ageGroup)),
+								backgroundColor: 'rgba({{$colorGradient}},{{$colorGradient}},{{$colorGradient}},0.8)',
+							},
+						@endforeach
 					]
 				},
 				options: {

@@ -78,6 +78,7 @@ class SquadController
 				'assistant_name' => $assistantNames[$index] ?? null,
 				'physical_score' => round($physicalScore, 2),
 				'mental_score' => round($mentalScore, 2),
+				'color' => fake()->hexColor(),
 			]);
 
 			foreach ($squadMembers as $member) {
@@ -86,5 +87,24 @@ class SquadController
 		}
 
 		return redirect()->route('squads.index');
+	}
+
+	public function edit(Squad $squad)
+	{
+		return view('pages.squad', compact('squad'));
+	}
+
+	public function update(Request $request, Squad $squad)
+	{
+		$request->validate([
+			'name' => 'required|string|min:3|max:50',
+			'leader_name' => 'required|string|min:2|max:100',
+			'assistant_name' => 'nullable|string|max:100',
+			'color' => 'nullable|regex:/^#[0-9A-Fa-f]{6}$/',
+		]);
+
+		$squad->update($request->only(['name', 'leader', 'assistant', 'color']));
+
+		return redirect()->route('squads.index')->with('success', 'Загін оновлено!');
 	}
 }

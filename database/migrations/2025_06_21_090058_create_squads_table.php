@@ -15,6 +15,7 @@ return new class extends Migration
 		    $table->string('assistant_name')->nullable();
 		    $table->decimal('physical_score', 8, 2)->nullable();
 		    $table->decimal('mental_score', 8, 2)->nullable();
+		    $table->string('color')->nullable();
 		    $table->timestamps();
 	    });
     }

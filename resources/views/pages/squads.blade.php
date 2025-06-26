@@ -36,7 +36,6 @@
 		<!-- Результати розподілу -->
 		@if (!empty($squads))
 			<div class="space-y-4 sm:space-y-6">
-
 				@php
 					$maxSquadScorePercent = $squads?->pluck('members')->max()?->count() * 100;
 				@endphp
@@ -47,10 +46,15 @@
 						$mentalScorePercent = ($squad->mental_score * 100) / $maxSquadScorePercent;
 					@endphp
 					<div>
+						<h3 class="text-base sm:text-lg font-semibold text-gray-700 mb-2">{{ $squad->name }}</h3>
 						<div class="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-2 sm:mb-4">
-							<div>
-								<h3 class="text-base sm:text-lg font-semibold text-gray-700">{{ $squad->name }}</h3>
-								<span class="text-xs sm:text-sm text-gray-500 block sm:inline">({{ count($squad->members) }} учасників)</span>
+							<div class="flex items-center space-x-2">
+								@if ($squad->color)
+									<span class="d-inline-block" style="width: 20px; height: 20px; background-color: {{ $squad->color }}; border: 1px solid #000;"></span>
+								@else
+									<span class="text-gray-500">–</span>
+								@endif
+								<span class="text-xs sm:text-sm text-gray-500">({{ count($squad->members) }} учасників)</span>
 							</div>
 							<div class="flex flex-col sm:flex-row sm:space-x-4 mt-2 sm:mt-0">
 								<div class="flex items-center space-x-1 sm:space-x-2">
@@ -67,6 +71,10 @@
 									</div>
 									<span class="text-xs sm:text-sm text-gray-600">{{ round($squad->mental_score, 0) }}</span>
 								</div>
+								<a href="{{ route('squads.edit', $squad->id) }}"
+										class="text-blue-600 hover:text-blue-800 transition text-xs sm:text-sm mt-2 sm:mt-0">
+									Редагувати загін
+								</a>
 							</div>
 						</div>
 						<p class="text-xs sm:text-sm text-gray-600 mb-2 sm:mb-4">
@@ -81,10 +89,10 @@
 									<th class="px-2 py-1 sm:px-3 sm:py-2">Ім’я</th>
 									<th class="px-2 py-1 sm:px-3 sm:py-2">Вік</th>
 									<th class="px-2 py-1 sm:px-3 sm:py-2">Стать</th>
-									<th class="px-2 py-1 sm:px-3 sm:py-2  sm:table-cell">Дата народження</th>
+									<th class="px-2 py-1 sm:px-3 sm:py-2 sm:table-cell">Дата народження</th>
 									<th class="px-2 py-1 sm:px-3 sm:py-2">Фізична підготовка</th>
 									<th class="px-2 py-1 sm:px-3 sm:py-2">Креативність</th>
-									<th class="px-2 py-1 sm:px-4 sm:py-2  sm:table-cell">Дії</th>
+									<th class="px-2 py-1 sm:px-4 sm:py-2 sm:table-cell">Дії</th>
 								</tr>
 								</thead>
 								<tbody>
@@ -104,7 +112,7 @@
 										<td class="px-2 py-1 sm:px-3 sm:py-2">{{ $member->full_name ?? 'Невідомо' }}</td>
 										<td class="px-2 py-1 sm:px-3 sm:py-2">{{ $age }}</td>
 										<td class="px-2 py-1 sm:px-3 sm:py-2">{{ $member->gender === 'male' ? 'Чоловік' : 'Жінка' }}</td>
-										<td class="px-2 py-1 sm:px-3 sm:py-2  sm:table-cell {{ $isBirthdayWeek ? 'bg-green-400 rounded-lg' : '' }}">
+										<td class="px-2 py-1 sm:px-3 sm:py-2 sm:table-cell {{ $isBirthdayWeek ? 'bg-green-400 rounded-lg' : '' }}">
 											{{ $birthDate ? $birthDate->format('d.m.Y') : '-' }} {{ $isBirthdayWeek ? '🎂' : '' }}
 										</td>
 										<td class="px-2 py-1 sm:px-3 sm:py-2">
@@ -119,7 +127,7 @@
 											</div>
 											<span class="text-xs sm:text-sm text-gray-600">{{ number_format($member->mental_score, 2) }}</span>
 										</td>
-										<td class="px-2 py-1 sm:px-4 sm:py-2  sm:table-cell">
+										<td class="px-2 py-1 sm:px-4 sm:py-2 sm:table-cell">
 											<a href="{{ route('member.edit', $member->code) }}"
 													class="text-blue-600 hover:text-blue-800 transition">Редагувати</a>
 										</td>

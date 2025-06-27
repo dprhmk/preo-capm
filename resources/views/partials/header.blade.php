@@ -1,6 +1,6 @@
 @auth
-	<header class="bg-gray-100 py-4">
-		<div class="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-lg">
+	<header class="py-4">
+		<div class="max-w-4xl mx-auto p-6 backdrop-blur-xl bg-white/70 rounded-lg shadow-lg">
 			<div class="flex justify-between items-center">
 				<!-- Лівий блок: База та роль -->
 				<div class="flex items-center space-x-2">
@@ -43,7 +43,7 @@
 			</div>
 
 			<!-- Випадаюче меню для мобільних -->
-			<div id="burger-menu" class="hidden sm:hidden bg-white border-t border-gray-200 mt-2">
+			<div id="burger-menu" class="hidden ">
 				<nav class="flex flex-col p-4 space-y-6">
 					<a href="{{ route('qr.scan') }}"
 							class="text-blue-600 font-medium hover:text-blue-800 transition hover:underline duration-200">

@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-	<div class="max-w-4xl mx-auto mb-16 p-6 bg-white rounded-lg shadow-lg">
+	<div class="max-w-4xl mx-auto mb-16 p-6 backdrop-blur-xl bg-white/70 rounded-lg shadow-lg">
 		<!-- Заголовок із ім’ям -->
 		<div class="mb-8 text-center">
 			<h1 class="text-3xl font-extrabold text-blue-600 drop-shadow-md">

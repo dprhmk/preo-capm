@@ -10,6 +10,8 @@
 			background-image: url('/palatka.jpg');
 			background-size: cover;
 			background-position: center;
+			background-repeat: no-repeat;
+			background-color: #000;
 		}
 		@media (max-width: 768px) {
 			body {
@@ -26,7 +28,7 @@
 </head>
 <body class="text-white">
 	<div class="flex items-start justify-center min-h-screen md:items-center pt-12 md:pt-0">
-		<div class="backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl px-6 py-10 md:px-12 md:py-14 text-center shadow-2xl w-full max-w-xl mx-4">
+		<div class="backdrop-blur-xl bg-white/10 rounded-2xl px-6 py-10 md:px-12 md:py-14 text-center shadow-2xl w-full max-w-xl mx-4">
 			<h1 class="text-2xl md:text-4xl font-bold mb-8">До табору залишилось:</h1>
 
 			<div id="timer" class="flex justify-center items-center gap-2 md:gap-4 text-xl md:text-3xl font-mono tracking-wider flex-wrap">

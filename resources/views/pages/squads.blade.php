@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-	<div class="max-w-4xl mx-auto p-4 bg-white rounded-lg shadow-lg">
+	<div class="max-w-4xl mx-auto mb-16 p-4 backdrop-blur-xl bg-white/70 rounded-lg shadow-lg">
 		<h1 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
 			<span class="mr-2">🤝</span> Розподіл на загони
 		</h1>
@@ -98,7 +98,7 @@
 						</div>
 						<div class="overflow-x-auto rounded-lg">
 							<table class="w-full text-xs sm:text-sm text-left text-gray-700">
-								<thead class="text-xs bg-gray-100 text-gray-600">
+								<thead class="text-xs text-gray-600">
 								<tr>
 									<th class="px-2 py-1 sm:px-3 sm:py-2">N°</th>
 									<th class="px-2 py-1 sm:px-3 sm:py-2">Ім’я</th>

@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-	<div class="max-w-md mx-auto mt-16 p-6 bg-white rounded-lg shadow-lg">
+	<div class="max-w-md mx-auto mt-16 p-6 backdrop-blur-xl bg-white/70 rounded-lg shadow-lg">
 		<h1 class="text-xl font-bold mb-4">Вхід до Загінецької бази</h1>
 
 		@if ($errors->any())

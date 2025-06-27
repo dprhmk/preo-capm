@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Member;
+use App\Models\Squad;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -34,8 +35,8 @@ class MemberService
 			$validated
 		);
 
-		$squad = $member->squad;
-		if($squad) {
+		$squads = Squad::all();
+		foreach ($squads as $squad) {
 			$members = $squad->members;
 			$squad->physical_score = $members->pluck('physical_score')->sum();
 			$squad->mental_score = $members->pluck('mental_score')->sum();

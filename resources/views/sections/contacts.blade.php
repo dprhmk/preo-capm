@@ -106,7 +106,7 @@
 		<label class="block font-medium text-gray-700">Адреса проживання</label>
 		<textarea name="address" rows="3"
 				class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500
-	                     @error('address') border-red-500 @enderror" required>{{ old('address', $member?->address) }}</textarea>
+	                     @error('address') border-red-500 @enderror">{{ old('address', $member?->address) }}</textarea>
 		@error('address')
 		<p class="text-red-500 text-sm mt-1">{{ $message }}</p>
 		@enderror

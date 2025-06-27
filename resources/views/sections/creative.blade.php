@@ -57,7 +57,7 @@
 
 	<!-- Поетичні здібності -->
 	<div class="mb-4">
-		<label class="block font-medium text-gray-700 mb-1">Поетичні здібності</label>
+		<label class="block font-medium text-gray-700 mb-1">Вміння складати кричалки</label>
 		<select name="poetic_ability" class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500
                   @error('poetic_ability') border-red-500 @enderror" required>
 			<option value="">Не вказано</option>

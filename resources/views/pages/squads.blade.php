@@ -6,37 +6,38 @@
 			<span class="mr-2">🤝</span> Розподіл на загони
 		</h1>
 
-		<!-- Форма вибору кількості загонів -->
-		<form method="POST" action="{{ route('squads.store') }}" class="mb-6 sm:mb-8">
-			@csrf
-			<div class="space-y-4">
-				<div class="flex items-center gap-4">
-					<div class="w-full sm:w-auto">
-						<label for="squad_count" class="block font-medium text-gray-700 mb-1 text-sm sm:text-base">Кількість загонів</label>
-						<select id="squad_count" name="squad_count" class="w-full border rounded px-2 py-1 sm:px-3 sm:py-2 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 @error('squad_count') border-red-500 @enderror">
-							<option value="" disabled selected>Виберіть кількість</option>
-							@for ($i = 2; $i <= 6; $i++)
-								<option value="{{ $i }}" {{ ($squads->count() == $i) || (old('squad_count') == $i) ? 'selected' : '' }}>{{ $i }}</option>
-							@endfor
-						</select>
-						@error('squad_count')
-						<p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-						@enderror
+		@if(auth()->user()->role === 'admin')
+			<!-- Форма вибору кількості загонів -->
+			<form method="POST" action="{{ route('squads.store') }}" class="mb-6 sm:mb-8">
+				@csrf
+				<div class="space-y-4">
+					<div class="flex items-center gap-4">
+						<div class="w-full sm:w-auto">
+							<label for="squad_count" class="block font-medium text-gray-700 mb-1 text-sm sm:text-base">Кількість загонів</label>
+							<select id="squad_count" name="squad_count" class="w-full border rounded px-2 py-1 sm:px-3 sm:py-2 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 @error('squad_count') border-red-500 @enderror">
+								<option value="" disabled selected>Виберіть кількість</option>
+								@for ($i = 2; $i <= 6; $i++)
+									<option value="{{ $i }}" {{ ($squads->count() == $i) || (old('squad_count') == $i) ? 'selected' : '' }}>{{ $i }}</option>
+								@endfor
+							</select>
+							@error('squad_count')
+							<p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+							@enderror
+						</div>
 					</div>
-				</div>
 
-				@if(auth()->user()->role === 'admin')
 					<button type="submit" class="bg-blue-600 text-white font-medium px-3 py-1 sm:px-4 sm:py-2 rounded text-sm sm:text-base hover:bg-blue-700 transition duration-200">
 						{{ $squads->isEmpty() ? 'Розподілити' : 'Перерозподілити' }}
 					</button>
-				@endif
-			</div>
-		</form>
-
-		@include('partials.squads-analytics')
+				</div>
+			</form>
+		@endif
 
 		<!-- Результати розподілу -->
-		@if (!empty($squads))
+		@if ($squads->isNotEmpty())
+
+			@include('partials.squads-analytics')
+
 			<div class="space-y-4 sm:space-y-6">
 				@php
 					$maxSquadScorePercent = $squads?->pluck('members')->max()?->count() * 100;
@@ -44,8 +45,8 @@
 
 				@foreach ($squads as $squad)
 					@php
-						$physicalScorePercent = ($squad->physical_score * 100) / $maxSquadScorePercent;
-						$mentalScorePercent = ($squad->mental_score * 100) / $maxSquadScorePercent;
+						$physicalScorePercent = ($squad->physical_score * 100) / max($maxSquadScorePercent, 1);
+						$mentalScorePercent = ($squad->mental_score * 100) / max($maxSquadScorePercent, 1);
 					@endphp
 					<div>
 						<div class="space-y-4 mb-6">
@@ -155,7 +156,7 @@
 				@endforeach
 			</div>
 		@else
-			<p class="text-gray-500 text-center text-sm sm:text-base">Розподіліть учасників, щоб побачити загони.</p>
+			<p class="text-gray-500 text-center text-sm sm:text-base">Учасники ще не розподілені.</p>
 		@endif
 	</div>
 @endsection

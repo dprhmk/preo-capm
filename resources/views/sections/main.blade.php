@@ -53,7 +53,7 @@
 	@if($squads->isNotEmpty())
 		<div class="mb-4">
 			<label class="block font-medium">Загін</label>
-			<select name="squad_id" class="w-full border rounded px-3 py-2 @error('squad_id') border-red-500 @enderror" required>
+			<select name="squad_id" class="w-full border rounded px-3 py-2 @error('squad_id') border-red-500 @enderror">
 				<option value="">Не вказано</option>
 				@foreach($squads as $squad)
 					<option value="{{ $squad->id }}" {{ (old('squad_id') ?? $member?->squad?->id) === $squad->id ? 'selected' : '' }}> {{ $squad->name }} | {{ $squad->leader_name }}</option>

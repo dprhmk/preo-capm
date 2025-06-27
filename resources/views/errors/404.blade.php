@@ -7,7 +7,7 @@
 	<script src="https://cdn.tailwindcss.com"></script>
 	<style>
 		body {
-			background-image: url('/palatka.jpg');
+			background-image: url('/media/palatka.jpg');
 			background-size: cover;
 			background-position: center;
 			background-repeat: no-repeat;
@@ -15,7 +15,7 @@
 		}
 		@media (max-width: 768px) {
 			body {
-				background-image: url('/back_ground.jpg');
+				background-image: url('/media/back_ground.jpg');
 			}
 		}
 	</style>

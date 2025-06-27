@@ -58,7 +58,7 @@
 			</div>
 
 			<div class="mb-4">
-				<label class="block font-medium text-gray-700 mb-1">Колір загону (необов’язково)</label>
+				<label class="block font-medium text-gray-700 mb-1">Колір загону</label>
 				<div class="flex items-center space-x-2">
 					<input type="color" name="color" id="color" value="{{ old('color', $squad->color ?? '#000000') }}"
 							class="w-16 h-12 border-2 border-gray-300 rounded shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500

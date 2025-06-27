@@ -8,22 +8,18 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 
 class MemberService
 {
 	public function store(Request $request): RedirectResponse
 	{
-		$role = auth()->user()->role;
-		$data = array_merge($request->route()->parameters, $request->all());
-		unset($data['_token']);
-
-		$validationData = $this->getValidationData($data, $role);
+		$validationData = $this->getValidationData($request);
 		$validator = Validator::make(...$validationData);
 
 		if ($validator->fails()) {
 			Log::info('Validation failed', [
 				'errors' => $validator->errors()->toArray(),
-				'data' => $data,
 			]);
 			return redirect()
 				->back()
@@ -51,8 +47,13 @@ class MemberService
 			->with('success', 'Дані ' . $member->full_name . ' успішно збережено!');
 	}
 
-	private function getValidationData(array $data, string $role): array
+	private function getValidationData(Request $request): array
 	{
+		$role = auth()->user()->role;
+		$data = array_merge($request->route()->parameters, $request->all());
+		unset($data['_token']);
+		$data['code'] = Str::slug($data['code']);
+
 		$rules = [
 			'code' => 'required|string',
 		];
@@ -63,6 +64,7 @@ class MemberService
 				'birth_date'     => 'required|date',
 				'gender'         => 'required|in:male,female',
 				'residence_type' => 'required|in:stationary,non-stationary',
+				'squad_id'       => 'nullable|numeric|exists:squads,id',
 			], $rules);
 		}
 

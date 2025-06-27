@@ -25,9 +25,11 @@
 					</div>
 				</div>
 
-				<button type="submit" class="bg-blue-600 text-white font-medium px-3 py-1 sm:px-4 sm:py-2 rounded text-sm sm:text-base hover:bg-blue-700 transition duration-200">
-					{{ $squads->isEmpty() ? 'Розподілити' : 'Перерозподілити' }}
-				</button>
+				@if(auth()->user()->role === 'admin')
+					<button type="submit" class="bg-blue-600 text-white font-medium px-3 py-1 sm:px-4 sm:py-2 rounded text-sm sm:text-base hover:bg-blue-700 transition duration-200">
+						{{ $squads->isEmpty() ? 'Розподілити' : 'Перерозподілити' }}
+					</button>
+				@endif
 			</div>
 		</form>
 
@@ -46,41 +48,54 @@
 						$mentalScorePercent = ($squad->mental_score * 100) / $maxSquadScorePercent;
 					@endphp
 					<div>
-						<h3 class="text-base sm:text-lg font-semibold text-gray-700 mb-2">{{ $squad->name }}</h3>
-						<div class="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-2 sm:mb-4">
-							<div class="flex items-center space-x-2">
-								@if ($squad->color)
-									<span class="d-inline-block" style="width: 20px; height: 20px; background-color: {{ $squad->color }}; border: 1px solid #000;"></span>
-								@else
-									<span class="text-gray-500">–</span>
-								@endif
-								<span class="text-xs sm:text-sm text-gray-500">({{ count($squad->members) }} учасників)</span>
-							</div>
-							<div class="flex flex-col sm:flex-row sm:space-x-4 mt-2 sm:mt-0">
-								<div class="flex items-center space-x-1 sm:space-x-2">
-									<span class="text-xs sm:text-sm font-medium text-gray-600">Фізична підготовка:</span>
-									<div class="w-16 sm:w-20 bg-gray-200 rounded-full h-2">
-										<div class="bg-green-600 h-2 rounded-full" style="width: {{ $physicalScorePercent }}%"></div>
-									</div>
-									<span class="text-xs sm:text-sm text-gray-600">{{ round($squad->physical_score, 0) }}</span>
+						<div class="space-y-4 mb-6">
+							<!-- Color, Team Name, and Member Count -->
+							<div class="flex items-center justify-between">
+								<div class="flex items-center gap-2">
+									@if ($squad->color)
+										<span class="inline-block w-4 h-4 sm:w-5 sm:h-5 rounded-full border-2 border-gray-200 shadow-sm" style="background-color: {{ $squad->color }};"></span>
+									@else
+										<span class="text-gray-300">–</span>
+									@endif
+									<h3 class="text-lg sm:text-xl font-extrabold text-gray-900">{{ $squad->name }}</h3>
 								</div>
-								<div class="flex items-center space-x-1 sm:space-x-2 mt-1 sm:mt-0">
-									<span class="text-xs sm:text-sm font-medium text-gray-600">Ментальна креативність:</span>
-									<div class="w-16 sm:w-20 bg-gray-200 rounded-full h-2">
-										<div class="bg-blue-600 h-2 rounded-full" style="width: {{ $mentalScorePercent }}%"></div>
+								<span class="text-xs sm:text-sm text-gray-400">({{ count($squad->members) }} учасників)</span>
+							</div>
+							<!-- Stats and Edit Link -->
+							<div class="flex flex-col sm:flex-row sm:items-start gap-3 sm:gap-6">
+								<div class="flex flex-col sm:flex-row sm:gap-4 w-full">
+									<div class="flex items-center gap-2">
+										<span class="w-32 text-sm font-medium text-gray-600">Фізична підготовка:</span>
+										<div class="w-20 sm:w-24 bg-gray-200 rounded-full h-2.5">
+											<div class="bg-green-600 h-2.5 rounded-full transition-all duration-300" style="width: {{ $physicalScorePercent }}%"></div>
+										</div>
+										<span class="text-sm text-gray-600">{{ round($squad->physical_score, 0) }}</span>
 									</div>
-									<span class="text-xs sm:text-sm text-gray-600">{{ round($squad->mental_score, 0) }}</span>
+									<div class="flex items-center gap-2">
+										<span class="w-32 text-sm font-medium text-gray-600">Ментальна креативність:</span>
+										<div class="w-20 sm:w-24 bg-gray-200 rounded-full h-2.5">
+											<div class="bg-blue-600 h-2.5 rounded-full transition-all duration-300" style="width: {{ $mentalScorePercent }}%"></div>
+										</div>
+										<span class="text-sm text-gray-600">{{ round($squad->mental_score, 0) }}</span>
+									</div>
 								</div>
 								<a href="{{ route('squads.edit', $squad->id) }}"
-										class="text-blue-600 hover:text-blue-800 transition text-xs sm:text-sm mt-2 sm:mt-0">
+										class="block text-blue-600 text-sm font-medium sm:mt-0 mt-3 hover:text-blue-700 transition duration-150">
 									Редагувати загін
 								</a>
 							</div>
+							<!-- Leader and Assistant -->
+							<div class="flex flex-col sm:flex-row sm:gap-4">
+								<div class="flex items-center gap-2 mb-2 sm:mb-0">
+									<span class="w-32 text-sm font-semibold text-gray-700">Лідер:</span>
+									<span class="text-sm text-gray-800 bg-gray-50 px-3 py-1 rounded-md">{{ $squad->leader_name ?? 'Не вказано' }}</span>
+								</div>
+								<div class="flex items-center gap-2">
+									<span class="w-32 text-sm font-semibold text-gray-700">Помічник:</span>
+									<span class="text-sm text-gray-800 bg-gray-50 px-3 py-1 rounded-md">{{ $squad->assistant_name ?? 'Не вказано' }}</span>
+								</div>
+							</div>
 						</div>
-						<p class="text-xs sm:text-sm text-gray-600 mb-2 sm:mb-4">
-							Лідер: {{ $squad->leader_name ?? 'Не вказано' }} |
-							Помічник: {{ $squad->assistant_name ?? 'Не вказано' }}
-						</p>
 						<div class="overflow-x-auto rounded-lg">
 							<table class="w-full text-xs sm:text-sm text-left text-gray-700">
 								<thead class="text-xs bg-gray-100 text-gray-600">

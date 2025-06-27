@@ -44,7 +44,7 @@
 
 			<!-- Випадаюче меню для мобільних -->
 			<div id="burger-menu" class="hidden sm:hidden bg-white border-t border-gray-200 mt-2">
-				<nav class="flex flex-col p-4 space-y-2">
+				<nav class="flex flex-col p-4 space-y-6">
 					<a href="{{ route('qr.scan') }}"
 							class="text-blue-600 font-medium hover:text-blue-800 transition hover:underline duration-200">
 						Створити

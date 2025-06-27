@@ -103,7 +103,7 @@ class SquadController
 			'color' => 'nullable|regex:/^#[0-9A-Fa-f]{6}$/',
 		]);
 
-		$squad->update($request->only(['name', 'leader', 'assistant', 'color']));
+		$squad->update($request->only(['name', 'leader_name', 'assistant_name', 'color']));
 
 		return redirect()->route('squads.index')->with('success', 'Загін оновлено!');
 	}

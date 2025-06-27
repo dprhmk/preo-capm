@@ -24,6 +24,21 @@
 			height: 100%;
 			margin-top: -1.5rem;
 		}
+		@media (max-width: 640px) {
+			#timer {
+				gap: 0.25rem !important;
+			}
+			.timer-colon {
+				font-size: 1.5rem !important;
+				margin-top: -1rem;
+			}
+			.timer-unit {
+				min-width: 48px !important;
+			}
+			.timer-unit > div:first-child {
+				font-size: 1.875rem !important;
+			}
+		}
 	</style>
 </head>
 <body class="text-white">
@@ -31,23 +46,23 @@
 		<div class="backdrop-blur-xl bg-white/10 rounded-2xl px-6 py-10 md:px-12 md:py-14 text-center shadow-2xl w-full max-w-xl mx-4">
 			<h1 class="text-2xl md:text-4xl font-bold mb-8">До табору залишилось:</h1>
 
-			<div id="timer" class="flex justify-center items-center gap-2 md:gap-4 text-xl md:text-3xl font-mono tracking-wider flex-wrap">
-				<div class="flex flex-col items-center min-w-[60px]">
+			<div id="timer" class="flex justify-center items-center gap-2 md:gap-4 text-xl md:text-3xl font-mono tracking-wider flex-nowrap">
+				<div class="flex flex-col items-center min-w-[60px] timer-unit">
 					<div id="days" class="text-4xl md:text-5xl">00</div>
 					<div class="text-xs mt-1">днів</div>
 				</div>
 				<div class="timer-colon text-3xl md:text-5xl">:</div>
-				<div class="flex flex-col items-center min-w-[60px]">
+				<div class="flex flex-col items-center min-w-[60px] timer-unit">
 					<div id="hours" class="text-4xl md:text-5xl">00</div>
 					<div class="text-xs mt-1">год</div>
 				</div>
 				<div class="timer-colon text-3xl md:text-5xl">:</div>
-				<div class="flex flex-col items-center min-w-[60px]">
+				<div class="flex flex-col items-center min-w-[60px] timer-unit">
 					<div id="minutes" class="text-4xl md:text-5xl">00</div>
 					<div class="text-xs mt-1">хв</div>
 				</div>
 				<div class="timer-colon text-3xl md:text-5xl">:</div>
-				<div class="flex flex-col items-center min-w-[60px]">
+				<div class="flex flex-col items-center min-w-[60px] timer-unit">
 					<div id="seconds" class="text-4xl md:text-5xl">00</div>
 					<div class="text-xs mt-1">сек</div>
 				</div>

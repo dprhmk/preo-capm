@@ -23,4 +23,5 @@ Route::middleware(['auth'])->group(function () {
 	Route::post('/squads', [SquadController::class, 'store'])->name('squads.store');
 	Route::get('/squads/{squad}/edit', [SquadController::class, 'edit'])->name('squads.edit');
 	Route::put('/squads/{squad}', [SquadController::class, 'update'])->name('squads.update');
+	Route::post('/truncate-db', [SquadController::class, 'truncateDb'])->name('truncate-db');
 });

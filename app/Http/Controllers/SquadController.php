@@ -42,6 +42,16 @@ class SquadController
 		]);
 	}
 
+	public function truncateDb()
+	{
+		Schema::disableForeignKeyConstraints();
+		Squad::truncate();
+		Member::truncate();
+		Schema::enableForeignKeyConstraints();
+
+		return redirect()->route('squads.index')->with('success', 'Базу очищено');
+	}
+
 	public function store(Request $request)
 	{
 		$validator = Validator::make($request->all(), [

@@ -6,6 +6,13 @@
 			<span class="mr-2">🤝</span> Розподіл на загони
 		</h1>
 
+		<!-- Виводимо повідомлення про успіх -->
+		@if (session('success'))
+			<div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
+				{{ session('success') }}
+			</div>
+		@endif
+
 		@if(auth()->user()->role === 'admin')
 			<!-- Форма вибору кількості загонів -->
 			<form method="POST" action="{{ route('squads.store') }}" class="mb-6 sm:mb-8">
@@ -26,16 +33,21 @@
 						</div>
 					</div>
 
-					<button type="submit" class="bg-blue-600 text-white font-medium px-3 py-1 sm:px-4 sm:py-2 rounded text-sm sm:text-base hover:bg-blue-700 transition duration-200">
-						{{ $squads->isEmpty() ? 'Розподілити' : 'Перерозподілити' }}
-					</button>
+					<div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+						<button type="submit" class="bg-blue-600 text-white font-medium px-3 py-1 sm:px-4 sm:py-2 rounded text-sm sm:text-base hover:bg-blue-700 transition duration-200">
+							{{ $squads->isEmpty() ? 'Розподілити' : 'Перерозподілити' }}
+						</button>
+						<!-- Посилання "Очистити базу" -->
+						<a href="#" onclick="if (confirm('Ви впевнені, що хочете очистити базу даних? Цю дію не можна скасувати!')) { let form = document.createElement('form'); form.method = 'POST'; form.action = '{{ route('truncate-db') }}'; let csrf = document.createElement('input'); csrf.type = 'hidden'; csrf.name = '_token'; csrf.value = '{{ csrf_token() }}'; form.appendChild(csrf); document.body.appendChild(form); form.submit(); }" class="bg-red-600 text-white font-medium px-3 py-1 sm:px-4 sm:py-2 rounded text-sm sm:text-base hover:bg-red-700 transition duration-200 text-center">
+							Очистити базу
+						</a>
+					</div>
 				</div>
 			</form>
 		@endif
 
 		<!-- Результати розподілу -->
 		@if ($squads->isNotEmpty())
-
 			@include('partials.squads-analytics')
 
 			<div class="space-y-4 sm:space-y-6">

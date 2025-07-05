@@ -60,18 +60,7 @@ class MemberService
 		];
 
 		if(in_array($role, ['admin', 'main'])) {
-			$rules = array_merge([
-				'full_name'      => 'required|string|max:255',
-				'birth_date'     => 'required|date',
-				'gender'         => 'required|in:male,female',
-				'residence_type' => 'required|in:stationary,non-stationary',
-				'squad_id'       => 'nullable|numeric|exists:squads,id',
-			], $rules);
-		}
-
-		if(in_array($role, ['admin', 'contacts'])) {
 			// Обробка фото
-
 			if ( ! empty($data['photo_base64'])) {
 				$image = str_replace('data:image/jpeg;base64,', '', $data['photo_base64']);
 				$image = str_replace(' ', '+', $image);
@@ -83,6 +72,16 @@ class MemberService
 
 			$rules = array_merge([
 				'photo_url'          => 'nullable|string',
+				'full_name'      => 'required|string|max:255',
+				'birth_date'     => 'required|date',
+				'gender'         => 'required|in:male,female',
+				'residence_type' => 'required|in:stationary,non-stationary',
+				'squad_id'       => 'nullable|numeric|exists:squads,id',
+			], $rules);
+		}
+
+		if(in_array($role, ['admin', 'contacts'])) {
+			$rules = array_merge([
 				'child_phone'        => 'nullable|string|max:20',
 				'parent_phone'       => 'nullable|string|max:20',
 				'guardian_name'      => 'nullable|string|max:255',

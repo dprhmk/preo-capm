@@ -20,6 +20,10 @@ class MemberController
 
 	public function show(Request $request)
 	{
+		if( ! auth()->check()) {
+			return view('pages.mem');
+		}
+
 		$role = auth()->user()->role;
 		$code = $request->code;
 		$member = Member::where('code', $code)->first();

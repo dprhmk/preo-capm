@@ -1,4 +1,6 @@
 @php
+	use Illuminate\Support\Facades\Cache;
+
 	$gifs = [
 		'/media/gifs/astanavites.gif',
 		'/media/gifs/gif1.gif',
@@ -9,11 +11,21 @@
 		'/media/gifs/monkey.gif',
 		'/media/gifs/pig.gif',
 	];
-	$index = session()->get('gif_index', 0);
+
+	// Отримати поточний індекс із кешу (або 0, якщо його ще нема)
+	$index = Cache::get('global_gif_index', 0);
+
+	// Показуємо gif по цьому індексу
+	$gifToShow = $gifs[$index];
+
+	// Обчислюємо наступний індекс
 	$nextIndex = ($index + 1) % count($gifs);
-	session()->put('gif_index', $nextIndex);
+
+	// Оновлюємо кеш з новим індексом (на 10 років)
+	Cache::put('global_gif_index', $nextIndex, now()->addYears(10));
 @endphp
-<!DOCTYPE html>
+
+		<!DOCTYPE html>
 <html lang="uk">
 <head>
 	<meta charset="UTF-8" />
@@ -33,6 +45,6 @@
 	@vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body>
-	<img src="{{ $gifs[$index] }}" class="w-full object-contain rounded-xl mt-16 sm:h-screen sm:mt-0">
+	<img src="{{ $gifToShow }}" class="w-full object-contain rounded-xl mt-16 sm:h-screen sm:mt-0">
 </body>
 </html>

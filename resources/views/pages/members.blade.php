@@ -1,4 +1,23 @@
+@php use Illuminate\Support\Carbon; @endphp
 @extends('layouts.app')
+
+@php
+	$month = 7;
+	$first = Carbon::parse('2025-07-06 17:00:00', 'Europe/Kyiv');
+	$second = Carbon::parse('2025-07-13 17:00:00', 'Europe/Kyiv');
+	$now = Carbon::now('Europe/Kyiv');
+
+	$currentWeekStart = null;
+	$currentWeekDays = [];
+
+	if ($now->between($first, $first->copy()->addDays(6))) {
+		$currentWeekStart = $first;
+		$currentWeekDays = range(6, 12);
+	} elseif ($now->between($second, $second->copy()->addDays(6))) {
+		$currentWeekStart = $second;
+		$currentWeekDays = range(13, 19);
+	}
+@endphp
 
 @section('content')
 	<div class="max-w-4xl mx-auto mb-16 p-6 backdrop-blur-xl bg-white/70 rounded-lg shadow-lg">
@@ -22,13 +41,12 @@
 					<tbody>
 					@foreach ($members as $member)
 						@php
-							$birthDate = $member->birth_date ? \Carbon\Carbon::parse($member->birth_date) : null;
+							$birthDate = $member->birth_date ? Carbon::parse($member->birth_date) : null;
 							$isBirthdayWeek = $birthDate &&
-								$birthDate->month == 7 &&
-								$birthDate->day >= 13 &&
-								$birthDate->day <= 19;
+								$birthDate->month == $month &&
+								in_array($birthDate->day, $currentWeekDays);
 						@endphp
-						<tr class="border-b">
+						<tr class="border-b {{ $member->isRequiredFilled === false ? 'bg-red-400' : '' }}">
 							<td class="px-4 py-2">{{ $loop->iteration }}</td>
 							<td class="px-4 py-2">{{ $member->full_name ?? 'Невідомо' }}</td>
 							<td class="px-4 py-2 {{ $isBirthdayWeek ? 'bg-green-400 rounded-lg' : '' }}">

@@ -71,7 +71,7 @@ class MemberService
 			unset($data['photo_base64']);
 
 			$rules = array_merge([
-				'photo_url'          => 'nullable|string',
+				'photo_url'      => 'nullable|string',
 				'full_name'      => 'required|string|max:255',
 				'birth_date'     => 'required|date',
 				'gender'         => 'required|in:male,female',

@@ -6,7 +6,16 @@
 
 @section('content')
 	<div class="max-w-4xl mx-auto mb-16 p-6 backdrop-blur-xl bg-white/70 rounded-lg shadow-lg">
-		<h2 class="text-2xl font-bold mb-4">Сканування QR-коду</h2>
+
+{{--		<h2 class="text-2xl font-bold mb-4">Сканування QR-коду</h2>--}}
+
+		<div id="qr-reader" class="mx-auto mb-4" style="width: 300px;"></div>
+
+		<p class="mb-4 text-gray-600">Наведіть камеру на QR-код, щоб перейти за посиланням.</p>
+
+		<div class="mb-4">
+			<select id="cameraSelect" class="w-full border rounded px-3 py-2"></select>
+		</div>
 
 		<!-- Виводимо повідомлення про успіх -->
 		@if (session('success'))
@@ -15,13 +24,6 @@
 			</div>
 		@endif
 
-		<p class="mb-4 text-gray-600">Наведіть камеру на QR-код, щоб перейти за посиланням.</p>
-
-		<div class="mb-4">
-			<select id="cameraSelect" class="w-full border rounded px-3 py-2"></select>
-		</div>
-
-		<div id="qr-reader" class="mx-auto mb-4" style="width: 300px;"></div>
 		<div id="qr-reader-results" class="mb-6 text-sm text-gray-500"></div>
 
 		<hr class="my-6">

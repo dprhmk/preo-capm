@@ -168,9 +168,13 @@
 										$physicalScorePercent = $member->physical_score ? min($member->physical_score, 100) : 0;
 										$mentalScorePercent = $member->mental_score ? min($member->mental_score, 100) : 0;
 									@endphp
-									<tr class="border-b {{ $member->is_required_filled === 0 ? 'bg-red-400' : '' }}">
+									@if($member->is_leader)
+										<tr class="border-b {{ $member->is_required_filled === 0 ? 'bg-red-300' : 'bg-blue-300' }}">
+									@else
+										<tr class="border-b {{ $member->is_required_filled === 0 ? 'bg-red-300' : '' }}">
+									@endif
 										<td class="px-2 py-1 sm:px-3 sm:py-2">{{ $loop->iteration }}</td>
-										<td class="px-2 py-1 sm:px-3 sm:py-2">{{ $member->full_name ?? 'Невідомо' }}</td>
+										<td class="px-2 py-1 sm:px-3 sm:py-2">{{ $member->full_name ?? '-' }}</td>
 										<td class="px-2 py-1 sm:px-3 sm:py-2">{{ $age }}</td>
 										<td class="px-2 py-1 sm:px-3 sm:py-2">{{ $member->gender === 'male' ? 'Чоловік' : 'Жінка' }}</td>
 										<td class="px-2 py-1 sm:px-3 sm:py-2 sm:table-cell {{ $isBirthdayWeek ? 'bg-green-400 rounded-lg' : '' }}">

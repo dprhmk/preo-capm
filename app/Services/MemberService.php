@@ -106,6 +106,7 @@ class MemberService
 				'gender'         => 'required|in:male,female',
 				'residence_type' => 'required|in:stationary,non-stationary',
 				'squad_id'       => 'nullable|numeric|exists:squads,id',
+				'is_leader'      => 'nullable|boolean',
 			], $rules);
 		}
 

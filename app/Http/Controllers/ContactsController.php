@@ -9,7 +9,9 @@ class ContactsController
 	public function index()
 	{
 		$squads = Squad::with(['members' => function ($query) {
-			$query->orderByRaw("`physical_score` + `mental_score` DESC");
+			$query
+				->orderByDesc('is_leader')
+				->orderByRaw("`physical_score` + `mental_score` DESC");
 		}])
 			->get()
 			->groupBy('name')

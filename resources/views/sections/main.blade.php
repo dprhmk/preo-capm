@@ -86,6 +86,20 @@
 			@enderror
 		</div>
 
+		<!-- Лідер ? -->
+		<div class="mb-4">
+			<label class="inline-flex items-center cursor-pointer">
+				<input type="checkbox" name="is_leader" value="1"
+						{{ old('is_leader', $member?->is_leader) ? 'checked' : '' }}
+						class="mr-2 h-5 w-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500
+	                      @error('is_leader') border-red-500 @enderror">
+				<span class="text-gray-700 font-medium">Капітан ?</span>
+			</label>
+			@error('is_leader')
+			<p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+			@enderror
+		</div>
+
 	@endif
 
 	@push('scripts')

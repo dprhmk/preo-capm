@@ -57,11 +57,15 @@
 								</thead>
 								<tbody>
 								@foreach ($squad->members as $member)
-									<tr class="border-b {{ $member->is_required_filled === 0 ? 'bg-red-400' : '' }}">
+									@if($member->is_leader)
+										<tr class="border-b {{ $member->is_required_filled === 0 ? 'bg-red-300' : 'bg-blue-300' }}">
+									@else
+										<tr class="border-b {{ $member->is_required_filled === 0 ? 'bg-red-300' : '' }}">
+									@endif
 										<td class="px-2 py-1 sm:px-3 sm:py-2">{{ $loop->iteration }}</td>
-										<td class="px-2 py-1 sm:px-3 sm:py-2">{{ $member->full_name ?? 'Невідомо' }}</td>
+										<td class="px-2 py-1 sm:px-3 sm:py-2">{{ $member->full_name ?? '-' }}</td>
 										<td class="px-2 py-1 sm:px-3 sm:py-2">{{ $member?->child_phone ?? '-' }}</td>
-										<td class="px-2 py-1 sm:px-3 sm:py-2">{{ $member?->guardian_name ?? 'Невідомо' }}</td>
+										<td class="px-2 py-1 sm:px-3 sm:py-2">{{ $member?->guardian_name ?? '-' }}</td>
 										<td class="px-2 py-1 sm:px-3 sm:py-2">{{ $member?->parent_phone ?? '-' }}</td>
 										<td class="px-2 py-1 sm:px-4 sm:py-2 sm:table-cell">
 											<a href="{{ route('member.edit', $member->code) }}"

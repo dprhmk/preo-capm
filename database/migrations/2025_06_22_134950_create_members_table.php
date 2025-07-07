@@ -62,7 +62,8 @@ return new class extends Migration
 			$table->decimal('physical_score', 8, 2)->nullable();
 			$table->decimal('mental_score', 8, 2)->nullable();
 
-			$table->boolean('is_required_filled')->default(true);
+			$table->boolean('is_required_filled')->default(false);
+			$table->boolean('is_leader')->default(false);
 
 			$table->timestamps();
 		});

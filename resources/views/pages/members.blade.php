@@ -2,20 +2,16 @@
 @extends('layouts.app')
 
 @php
-	$month = 7;
 	$first = Carbon::parse('2025-07-06 17:00:00', 'Europe/Kyiv');
 	$second = Carbon::parse('2025-07-13 17:00:00', 'Europe/Kyiv');
 	$now = Carbon::now('Europe/Kyiv');
 
-	$currentWeekStart = null;
-	$currentWeekDays = [];
+	$current = null;
 
 	if ($now->between($first, $first->copy()->addDays(6))) {
-		$currentWeekStart = $first;
-		$currentWeekDays = range(6, 12);
+		$current = $first;
 	} elseif ($now->between($second, $second->copy()->addDays(6))) {
-		$currentWeekStart = $second;
-		$currentWeekDays = range(13, 19);
+		$current = $second;
 	}
 @endphp
 
@@ -42,9 +38,10 @@
 					@foreach ($members as $member)
 						@php
 							$birthDate = $member->birth_date ? Carbon::parse($member->birth_date) : null;
-							$isBirthdayWeek = $birthDate &&
-								$birthDate->month == $month &&
-								in_array($birthDate->day, $currentWeekDays);
+							$isBirthdayWeek = $birthDate
+								&& isset($current)
+								&& collect(range(0, 6))
+									->contains(fn($i) => $birthDate->format('m-d') === $current->copy()->addDays($i)->format('m-d'));
 						@endphp
 						<tr class="border-b {{ $member->isRequiredFilled === false ? 'bg-red-400' : '' }}">
 							<td class="px-4 py-2">{{ $loop->iteration }}</td>

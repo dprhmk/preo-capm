@@ -168,7 +168,7 @@
 										$physicalScorePercent = $member->physical_score ? min($member->physical_score, 100) : 0;
 										$mentalScorePercent = $member->mental_score ? min($member->mental_score, 100) : 0;
 									@endphp
-									<tr class="border-b {{ $member->isRequiredFilled === false ? 'bg-red-400' : '' }}">
+									<tr class="border-b {{ $member->is_required_filled === false ? 'bg-red-400' : '' }}">
 										<td class="px-2 py-1 sm:px-3 sm:py-2">{{ $loop->iteration }}</td>
 										<td class="px-2 py-1 sm:px-3 sm:py-2">{{ $member->full_name ?? 'Невідомо' }}</td>
 										<td class="px-2 py-1 sm:px-3 sm:py-2">{{ $age }}</td>

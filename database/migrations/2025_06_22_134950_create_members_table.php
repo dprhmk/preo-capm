@@ -23,8 +23,8 @@ return new class extends Migration
 			/** 2. Контактна інформація */
 			$table->string('photo_url')->nullable();
 			$table->string('child_phone')->nullable();
-			$table->string('parent_phone')->nullable();
 			$table->string('guardian_name')->nullable();
+			$table->string('parent_phone')->nullable();
 			$table->string('additional_contact')->nullable(); // екстрений контакт
 			$table->json('social_links')->nullable(); // Instagram, Telegram, інші
 			$table->text('address')->nullable();
@@ -61,6 +61,8 @@ return new class extends Migration
 
 			$table->decimal('physical_score', 8, 2)->nullable();
 			$table->decimal('mental_score', 8, 2)->nullable();
+
+			$table->boolean('is_required_filled')->default(true);
 
 			$table->timestamps();
 		});

@@ -65,7 +65,7 @@
 		<select name="residence_type" class="w-full border rounded px-3 py-2 @error('residence_type') border-red-500 @enderror" required>
 			<option value="">Не вказано</option>
 			<option value="stationary" {{ (old('residence_type') ?? $member?->residence_type) == 'stationary' ? 'selected' : '' }}>Стаціонар</option>
-			<option value="non-stationary" {{ (old('residence_type') ?? $member?->residence_type) == 'non-stationary' ? 'selected' : '' }}>Не стаціонар</option>
+			<option value="non-stationary" {{ (old('residence_type') ?? $member?->residence_type) == 'non-stationary' ? 'selected' : '' }}>Загінецький</option>
 		</select>
 		@error('residence_type')
 			<p class="text-red-500 text-sm mt-1">{{ $message }}</p>

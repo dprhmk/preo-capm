@@ -20,6 +20,10 @@
 								class="text-blue-600 font-medium hover:text-blue-800 transition hover:underline duration-200">
 							Список учасників
 						</a>
+						<a href="{{ route('contacts.index') }}"
+								class="text-blue-600 font-medium hover:text-blue-800 transition hover:underline duration-200">
+							Контакти
+						</a>
 						<a href="{{ route('squads.index') }}"
 								class="text-blue-600 font-medium hover:text-blue-800 transition hover:underline duration-200">
 							Список загонів
@@ -52,6 +56,10 @@
 					<a href="{{ route('members.index') }}"
 							class="text-blue-600 font-medium hover:text-blue-800 transition hover:underline duration-200">
 						Список учасників
+					</a>
+					<a href="{{ route('contacts.index') }}"
+							class="text-blue-600 font-medium hover:text-blue-800 transition hover:underline duration-200">
+						Контакти
 					</a>
 					<a href="{{ route('squads.index') }}"
 							class="text-blue-600 font-medium hover:text-blue-800 transition hover:underline duration-200">

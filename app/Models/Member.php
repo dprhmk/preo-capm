@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Services\MemberScoreService;
+use App\Services\MemberService;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -29,10 +30,15 @@ class Member extends Model
 		parent::boot();
 
 		static::saving(function (Member $member) {
+			$memberService = new MemberService();
 			$scoreService = app(MemberScoreService::class);
+
+
 			$scores = $scoreService->calculateScores($member);
 			$member->physical_score = $scores['physical_score'];
 			$member->mental_score = $scores['mental_score'];
+
+			$member->is_required_filled = $memberService->isRequiredFilled($member);
 		});
 	}
 }

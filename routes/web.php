@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ContactsController;
 use App\Http\Controllers\SquadController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\MemberController;
@@ -17,6 +18,8 @@ Route::middleware(['auth'])->group(function () {
 	Route::get('/qr-scan', fn () => view('pages.qr-scanner'))->name('qr.scan');
 	Route::get('/members', [MemberController::class, 'index'])->name('members.index');
 	Route::post('/member/{code}', [MemberController::class, 'store'])->name('member.store');
+
+	Route::get('/contacts', [ContactsController::class, 'index'])->name('contacts.index');
 
 	Route::get('/squads', [SquadController::class, 'index'])->name('squads.index');
 	Route::post('/squads', [SquadController::class, 'store'])->name('squads.store');

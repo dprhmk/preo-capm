@@ -13,6 +13,35 @@ use Illuminate\Support\Str;
 
 class MemberService
 {
+	public function isRequiredFilled(Member $member): bool
+	{
+		$requiredFields = [
+			'photo_url',
+			'full_name',
+			'birth_date',
+			'gender',
+			'residence_type',
+			'height_cm',
+			'body_type',
+			'agility_level',
+			'strength_level',
+			'personality_type',
+			'artistic_ability',
+			'poetic_ability',
+		];
+
+		$isFilled = TRUE;
+
+		foreach ($requiredFields as $field) {
+			if (empty($member->$field)) {
+				$isFilled = false;
+				break;
+			}
+		}
+
+		return $isFilled;
+	}
+
 	public function store(Request $request): RedirectResponse
 	{
 		$validationData = $this->getValidationData($request);

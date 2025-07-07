@@ -18,6 +18,7 @@ Route::middleware(['auth'])->group(function () {
 	Route::get('/qr-scan', fn () => view('pages.qr-scanner'))->name('qr.scan');
 	Route::get('/members', [MemberController::class, 'index'])->name('members.index');
 	Route::post('/member/{code}', [MemberController::class, 'store'])->name('member.store');
+	Route::post('/member/delete/{code}', [MemberController::class, 'delete'])->name('member.delete');
 
 	Route::get('/contacts', [ContactsController::class, 'index'])->name('contacts.index');
 

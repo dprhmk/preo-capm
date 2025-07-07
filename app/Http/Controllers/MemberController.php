@@ -42,4 +42,18 @@ class MemberController
 	{
 		return $memberService->store($request);
 	}
+
+	public function delete(Request $request)
+	{
+		$code = $request->code;
+		$member = Member::query()->where('code', $code)->first();
+
+		if($member) {
+			$member->delete();
+		}
+
+		return redirect()
+			->route('members.index')
+			->with('success', 'Учасника ' . $member->full_name . ' успішно видалено!');
+	}
 }

@@ -102,6 +102,16 @@
 
 	@endif
 
+	@if($role === 'admin')
+		<div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+			<a href="#"
+					onclick="if (confirm('Ви впевнені, що хочете видалити учасника? Цю дію не можливо буде відмінити!')) { let form = document.createElement('form'); form.method = 'POST'; form.action = '{{ route('member.delete', $member->code) }}'; let csrf = document.createElement('input'); csrf.type = 'hidden'; csrf.name = '_token'; csrf.value = '{{ csrf_token() }}'; form.appendChild(csrf); document.body.appendChild(form); form.submit(); }"
+					class="bg-red-600 text-white font-medium px-3 py-1 sm:px-4 sm:py-2 rounded text-sm sm:text-base hover:bg-red-700 transition duration-200 text-center">
+				Видалити
+			</a>
+		</div>
+	@endif
+
 	@push('scripts')
 		<script>
 			document.addEventListener('DOMContentLoaded', () => {

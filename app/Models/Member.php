@@ -40,5 +40,16 @@ class Member extends Model
 
 			$member->is_required_filled = $memberService->isRequiredFilled($member);
 		});
+
+		static::deleted(function (Member $member) {
+			$squad = $member->squad;
+
+			$squadMembers = $squad->members()->get();
+
+			$squad->physical_score = round($squadMembers->sum('physical_score'), 2);
+			$squad->mental_score = round($squadMembers->sum('mental_score'), 2);
+
+			$squad->save();
+		});
 	}
 }

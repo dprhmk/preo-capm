@@ -11,7 +11,7 @@ class MemberController
 {
 	public function index()
 	{
-		$members = Member::query()->paginate(150);
+		$members = Member::query()->get();
 
 		$members->each(function (Member $member) {
 			$requiredFields = [

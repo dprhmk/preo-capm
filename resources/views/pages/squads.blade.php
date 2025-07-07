@@ -1,4 +1,20 @@
+@php use Illuminate\Support\Carbon; @endphp
+
 @extends('layouts.app')
+
+@php
+	$first = Carbon::parse('2025-07-06 17:00:00', 'Europe/Kyiv');
+	$second = Carbon::parse('2025-07-13 17:00:00', 'Europe/Kyiv');
+	$now = Carbon::now('Europe/Kyiv');
+
+	$current = NULL;
+
+	if ($now->between($first, $first->copy()->addDays(6))) {
+		$current = $first;
+	} elseif ($now->between($second, $second->copy()->addDays(6))) {
+		$current = $second;
+	}
+@endphp
 
 @section('content')
 	<div class="max-w-4xl mx-auto mb-16 p-4 backdrop-blur-xl bg-white/70 rounded-lg shadow-lg">
@@ -15,13 +31,14 @@
 
 		@if(auth()->user()->role === 'admin')
 			<!-- Форма вибору кількості загонів -->
-			<form method="POST" action="{{ route('squads.store') }}" class="mb-6 sm:mb-8">
+			<form method="POST" action="{{ route('squads.store') }}" class="mb-6 sm:mb-8" id="squad-form">
 				@csrf
 				<div class="space-y-4">
 					<div class="flex items-center gap-4">
 						<div class="w-full sm:w-auto">
 							<label for="squad_count" class="block font-medium text-gray-700 mb-1 text-sm sm:text-base">Кількість загонів</label>
-							<select id="squad_count" name="squad_count" class="w-full border rounded px-2 py-1 sm:px-3 sm:py-2 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 @error('squad_count') border-red-500 @enderror">
+							<select id="squad_count" name="squad_count"
+									class="w-full border rounded px-2 py-1 sm:px-3 sm:py-2 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 @error('squad_count') border-red-500 @enderror">
 								<option value="" disabled selected>Виберіть кількість</option>
 								@for ($i = 2; $i <= 6; $i++)
 									<option value="{{ $i }}" {{ ($squads->count() == $i) || (old('squad_count') == $i) ? 'selected' : '' }}>{{ $i }}</option>
@@ -37,13 +54,28 @@
 						<button type="submit" class="bg-blue-600 text-white font-medium px-3 py-1 sm:px-4 sm:py-2 rounded text-sm sm:text-base hover:bg-blue-700 transition duration-200">
 							{{ $squads->isEmpty() ? 'Розподілити' : 'Перерозподілити' }}
 						</button>
+
 						<!-- Посилання "Очистити базу" -->
-						<a href="#" onclick="if (confirm('Ви впевнені, що хочете очистити базу даних? Цю дію не можна скасувати!')) { let form = document.createElement('form'); form.method = 'POST'; form.action = '{{ route('truncate-db') }}'; let csrf = document.createElement('input'); csrf.type = 'hidden'; csrf.name = '_token'; csrf.value = '{{ csrf_token() }}'; form.appendChild(csrf); document.body.appendChild(form); form.submit(); }" class="bg-red-600 text-white font-medium px-3 py-1 sm:px-4 sm:py-2 rounded text-sm sm:text-base hover:bg-red-700 transition duration-200 text-center">
+						<a href="#"
+								onclick="if (confirm('Ви впевнені, що хочете очистити базу даних? Цю дію не можливо буде відмінити!')) { let form = document.createElement('form'); form.method = 'POST'; form.action = '{{ route('truncate-db') }}'; let csrf = document.createElement('input'); csrf.type = 'hidden'; csrf.name = '_token'; csrf.value = '{{ csrf_token() }}'; form.appendChild(csrf); document.body.appendChild(form); form.submit(); }"
+								class="bg-red-600 text-white font-medium px-3 py-1 sm:px-4 sm:py-2 rounded text-sm sm:text-base hover:bg-red-700 transition duration-200 text-center">
 							Очистити базу
 						</a>
 					</div>
 				</div>
 			</form>
+
+			@push('scripts')
+				<script>
+					document.getElementById('squad-form').addEventListener('submit', function(e) {
+						const confirmed = confirm('{{ $squads->isEmpty() ? "Ви впевнені, що хочете розподілити учасників по загонах?" : "Ви впевнені, що хочете перерозподілити учасників? Попередній розподіл буде втрачено." }}');
+						if (!confirmed) {
+							e.preventDefault();
+						}
+					});
+				</script>
+			@endpush
+
 		@endif
 
 		<!-- Результати розподілу -->
@@ -126,16 +158,17 @@
 								<tbody>
 								@foreach ($squad->members as $member)
 									@php
-										$birthDate = $member->birth_date ?? null;
-										$isBirthdayWeek = $birthDate &&
-											$birthDate->month == 7 &&
-											$birthDate->day >= 13 &&
-											$birthDate->day <= 19;
+										$birthDate = $member->birth_date ? Carbon::parse($member->birth_date) : NULL;
+										$isBirthdayWeek = $birthDate
+											&& isset($current)
+											&& collect(range(0, 6))
+												->contains(fn($i) => $birthDate->format('m-d') === $current->copy()->addDays($i)->format('m-d'));
+
 										$age = $birthDate ? floor($birthDate->diffInYears(now())) : '-';
 										$physicalScorePercent = $member->physical_score ? min($member->physical_score, 100) : 0;
 										$mentalScorePercent = $member->mental_score ? min($member->mental_score, 100) : 0;
 									@endphp
-									<tr class="border-b hover:bg-gray-50">
+									<tr class="border-b {{ $member->isRequiredFilled === false ? 'bg-red-400' : '' }}">
 										<td class="px-2 py-1 sm:px-3 sm:py-2">{{ $loop->iteration }}</td>
 										<td class="px-2 py-1 sm:px-3 sm:py-2">{{ $member->full_name ?? 'Невідомо' }}</td>
 										<td class="px-2 py-1 sm:px-3 sm:py-2">{{ $age }}</td>

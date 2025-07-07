@@ -34,6 +34,36 @@ class SquadController
 			->map(fn ($squad) => $squad->first())
 			->values();
 
+		foreach ($squads as $squad) {
+			$squad->members->each(function (Member $member) {
+				$requiredFields = [
+					'photo_url',
+					'full_name',
+					'birth_date',
+					'gender',
+					'residence_type',
+					'height_cm',
+					'body_type',
+					'agility_level',
+					'strength_level',
+					'personality_type',
+					'artistic_ability',
+					'poetic_ability',
+				];
+
+				$isFilled = true;
+
+				foreach ($requiredFields as $field) {
+					if (empty($member->$field)) {
+						$isFilled = false;
+						break;
+					}
+				}
+
+				$member->isRequiredFilled = $isFilled;
+			});
+		}
+
 		$analyticsData = $this->squadAnalyticsService->getAnalytics($squads);
 
 		return view('pages.squads', [

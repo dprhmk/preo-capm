@@ -57,7 +57,7 @@
 								</thead>
 								<tbody>
 								@foreach ($squad->members as $member)
-									<tr class="border-b {{ $member->is_required_filled === false ? 'bg-red-400' : '' }}">
+									<tr class="border-b {{ $member->is_required_filled === 0 ? 'bg-red-400' : '' }}">
 										<td class="px-2 py-1 sm:px-3 sm:py-2">{{ $loop->iteration }}</td>
 										<td class="px-2 py-1 sm:px-3 sm:py-2">{{ $member->full_name ?? 'Невідомо' }}</td>
 										<td class="px-2 py-1 sm:px-3 sm:py-2">{{ $member?->child_phone ?? '-' }}</td>

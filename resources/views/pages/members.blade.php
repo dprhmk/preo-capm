@@ -43,7 +43,7 @@
 								&& collect(range(0, 6))
 									->contains(fn($i) => $birthDate->format('m-d') === $current->copy()->addDays($i)->format('m-d'));
 						@endphp
-						<tr class="border-b {{ $member->is_required_filled === false ? 'bg-red-400' : '' }}">
+						<tr class="border-b {{ $member->is_required_filled === 0 ? 'bg-red-400' : '' }}">
 							<td class="px-4 py-2">{{ $loop->iteration }}</td>
 							<td class="px-4 py-2">{{ $member->full_name ?? 'Невідомо' }}</td>
 							<td class="px-4 py-2 {{ $isBirthdayWeek ? 'bg-green-400 rounded-lg' : '' }}">

@@ -21,6 +21,13 @@
 			<span class="mr-2">📋</span> Список учасників
 		</h1>
 
+		<!-- Виводимо повідомлення про успіх -->
+		@if (session('success'))
+			<div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
+				{{ session('success') }}
+			</div>
+		@endif
+
 		@if ($members->isEmpty())
 			<p class="text-gray-500 text-center">Учасників не знайдено.</p>
 		@else

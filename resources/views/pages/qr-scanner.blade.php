@@ -70,6 +70,7 @@
 						if ("vibrate" in navigator) {
 							navigator.vibrate(100);
 						}
+						html5QrCode.stop();
 						window.location.href = decodedText;
 					},
 					error => {
